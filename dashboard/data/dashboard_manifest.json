@@ -1,0 +1,14 @@
+{
+  "forecast_row_count": 28512,
+  "forecast_date_start": "2017-08-16",
+  "forecast_date_end": "2017-08-31",
+  "forecast_horizon_days": 16,
+  "forecast_store_count": 54,
+  "forecast_family_count": 33,
+  "recent_actual_row_count": 160380,
+  "recent_actual_date_start": "2017-05-18",
+  "recent_actual_date_end": "2017-08-15",
+  "source_model": "xgboost_log_target_nested",
+  "performance_source": "nested chronological backtesting",
+  "test_labels_available": false
+}
