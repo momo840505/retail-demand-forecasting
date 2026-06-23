@@ -1,0 +1,105 @@
+{
+  "train_dataset": {
+    "row_count": 3000888,
+    "column_count": 6,
+    "date_start": "2013-01-01",
+    "date_end": "2017-08-15",
+    "unique_dates": 1684,
+    "unique_stores": 54,
+    "unique_families": 33,
+    "missing_values": {
+      "id": 0,
+      "date": 0,
+      "store_nbr": 0,
+      "family": 0,
+      "sales": 0,
+      "onpromotion": 0
+    }
+  },
+  "test_dataset": {
+    "row_count": 28512,
+    "column_count": 5,
+    "date_start": "2017-08-16",
+    "date_end": "2017-08-31",
+    "forecast_horizon_days": 16,
+    "unique_stores": 54,
+    "unique_families": 33,
+    "expected_complete_grid_rows": 28512,
+    "is_complete_store_family_date_grid": true,
+    "days_after_training_end": 1,
+    "missing_values": {
+      "id": 0,
+      "date": 0,
+      "store_nbr": 0,
+      "family": 0,
+      "onpromotion": 0
+    }
+  },
+  "sales_quality": {
+    "zero_sales_count": 939130,
+    "zero_sales_percentage": 31.2951,
+    "negative_sales_count": 0,
+    "minimum_sales": 0.0,
+    "maximum_sales": 124717.0,
+    "average_sales": 357.7757263183594,
+    "median_sales": 11.0
+  },
+  "promotion_quality": {
+    "promotion_record_count": 611329,
+    "promotion_record_percentage": 20.3716,
+    "negative_onpromotion_count": 0,
+    "maximum_onpromotion": 741
+  },
+  "integrity_checks": {
+    "duplicate_train_id_count": 0,
+    "duplicate_train_business_key_count": 0,
+    "store_metadata_duplicate_count": 0,
+    "test_begins_after_training": true
+  },
+  "external_datasets": {
+    "stores": {
+      "row_count": 54,
+      "unique_stores": 54,
+      "missing_values": {
+        "store_nbr": 0,
+        "city": 0,
+        "state": 0,
+        "type": 0,
+        "cluster": 0
+      }
+    },
+    "oil": {
+      "row_count": 1218,
+      "date_start": "2013-01-01",
+      "date_end": "2017-08-31",
+      "missing_oil_price_count": 43,
+      "missing_values": {
+        "date": 0,
+        "dcoilwtico": 43
+      }
+    },
+    "holidays": {
+      "row_count": 350,
+      "unique_dates": 312,
+      "transferred_holiday_count": 12,
+      "missing_values": {
+        "date": 0,
+        "type": 0,
+        "locale": 0,
+        "locale_name": 0,
+        "description": 0,
+        "transferred": 0
+      }
+    },
+    "transactions": {
+      "row_count": 83488,
+      "date_start": "2013-01-01",
+      "date_end": "2017-08-15",
+      "missing_values": {
+        "date": 0,
+        "store_nbr": 0,
+        "transactions": 0
+      }
+    }
+  }
+}
