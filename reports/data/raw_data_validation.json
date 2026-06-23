@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "raw_data_directory": "C:\\Users\\momo8\\Desktop\\retail-demand-forecasting\\data\\raw",
+  "expected_file_count": 7,
+  "validated_file_count": 7,
+  "errors": []
+}
