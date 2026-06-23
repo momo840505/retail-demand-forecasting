@@ -1076,7 +1076,13 @@ with st.sidebar:
         """
     )
 
-    st.markdown("#### Planning focus")
+    st.markdown("#### Store-level planning focus")
+
+    st.caption(
+        "Store and product filters update **Store story** and "
+        "**Stock decision**. **Network pulse** always shows "
+        "the complete retail network."
+    )
     selected_store = st.selectbox(
         "Store",
         store_options,
@@ -1221,6 +1227,12 @@ overview_tab, demand_tab, planner_tab, trust_tab = st.tabs(
 # =============================================================================
 if overview_tab.open:
     with overview_tab:
+        st.caption(
+            f"Network scope · All {manifest['forecast_store_count']} stores "
+            f"and {manifest['forecast_family_count']} product families. "
+            "Sidebar filters affect Store story and Stock decision only."
+        )
+
         daily_network = (
             forecast_data.groupby("date", as_index=False)
             .agg(
