@@ -2833,3 +2833,64 @@ st.html(
     </style>
     """
 )
+
+# =============================================================================
+# Final sidebar selectbox value override
+# =============================================================================
+
+st.html(
+    """
+    <style>
+    /*
+    The sidebar uses white text, but select boxes have a white background.
+    Force every selected-value element inside the select box to dark text.
+    */
+
+    section[data-testid="stSidebar"]
+    div[data-baseweb="select"] > div {
+        background-color: #fffdfc !important;
+        border-color: #d8cec4 !important;
+    }
+
+    section[data-testid="stSidebar"]
+    div[data-baseweb="select"] > div *,
+    section[data-testid="stSidebar"]
+    div[data-baseweb="select"] [data-testid="stMarkdownContainer"],
+    section[data-testid="stSidebar"]
+    div[data-baseweb="select"] [data-testid="stMarkdownContainer"] *,
+    section[data-testid="stSidebar"]
+    div[data-baseweb="select"] input {
+        color: #211d1a !important;
+        -webkit-text-fill-color: #211d1a !important;
+        opacity: 1 !important;
+        font-weight: 650 !important;
+        text-shadow: none !important;
+    }
+
+    /*
+    Keep the dropdown arrow visible in the project accent colour.
+    */
+    section[data-testid="stSidebar"]
+    div[data-baseweb="select"] svg {
+        color: #5b2a3c !important;
+        fill: #5b2a3c !important;
+        stroke: #5b2a3c !important;
+        opacity: 1 !important;
+    }
+
+    /*
+    Dropdown options are rendered in a popover outside the sidebar.
+    */
+    div[data-baseweb="popover"] [role="listbox"] {
+        background-color: #fffdfc !important;
+    }
+
+    div[data-baseweb="popover"] [role="option"],
+    div[data-baseweb="popover"] [role="option"] * {
+        color: #211d1a !important;
+        -webkit-text-fill-color: #211d1a !important;
+        opacity: 1 !important;
+    }
+    </style>
+    """
+)
