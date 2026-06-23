@@ -223,28 +223,40 @@ After chronological evaluation, the final model produces a 16-day forecast for e
 
 ```mermaid
 flowchart TD
-    A[Raw Retail Data] --> B[Data Validation]
-    B --> C[Modeling Dataset]
-    C --> D[Horizon-Safe Features]
 
-    D --> E[Baseline Backtesting]
-    D --> F[XGBoost Backtesting]
+    subgraph PIPELINE["Forecasting Pipeline"]
+        A[Raw Retail Data] --> B[Data Validation]
+        B --> C[Modeling Dataset]
+        C --> D[Horizon-Safe Features]
 
-    E --> G[Model Comparison]
-    F --> G
+        D --> E[Baseline Backtesting]
+        D --> F[XGBoost Backtesting]
 
-    G --> H[Final Model]
-    H --> I[Prepared Forecast Data]
+        E --> G[Model Comparison]
+        F --> G
 
-    I --> J[Streamlit Dashboard]
-    I --> K[FastAPI Service]
+        G --> H[Final Model]
+        H --> I[Deployment-Ready Forecast Data]
+    end
 
-    J --> L[Replenishment Planner]
-    K --> L
+    subgraph APPLICATION["Application Layer"]
+        I --> J[Streamlit Dashboard]
+        I --> K[FastAPI Service]
 
-    M[Pytest] --> N[GitHub Actions]
-    N --> J
-    N --> K
+        J -->|uses| L[Shared Replenishment Engine]
+        K -->|uses| L
+    end
+
+    subgraph QUALITY["Testing and Deployment"]
+        M[GitHub Repository] --> N[GitHub Actions]
+        N --> O[Pytest, Compilation and API Checks]
+
+        M --> P[Streamlit Community Cloud]
+        M --> Q[Render]
+
+        P --> J
+        Q --> K
+    end
 ```
 
 ---
