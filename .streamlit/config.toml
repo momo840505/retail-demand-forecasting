@@ -1,11 +1,23 @@
-﻿[theme]
+[theme]
 base = "light"
-primaryColor = "#5B2A3C"
-backgroundColor = "#F7F3ED"
-secondaryBackgroundColor = "#FFFDFC"
-textColor = "#191715"
-font = "sans serif"
+primaryColor = "#B86A45"
+backgroundColor = "#F7F2EC"
+secondaryBackgroundColor = "#EFE7DE"
+textColor = "#211D1A"
+font = "sans-serif"
+
+[theme.sidebar]
+backgroundColor = "#171513"
+secondaryBackgroundColor = "#24211E"
+textColor = "#FFFDFC"
+primaryColor = "#D9A94E"
+font = "sans-serif"
 
 [server]
 headless = true
-runOnSave = true
+
+[browser]
+gatherUsageStats = false
+
+[client]
+toolbarMode = "viewer"

@@ -2531,3 +2531,305 @@ st.html(
     </div>
     """
 )
+
+# =============================================================================
+# Final mobile contrast override
+# Keep this block at the very end of the file so it overrides earlier CSS.
+# =============================================================================
+
+st.html(
+    """
+    <style>
+    /* =========================================================
+       Sidebar background and all text
+       ========================================================= */
+
+    section[data-testid="stSidebar"] {
+        background:
+            linear-gradient(
+                180deg,
+                #171513 0%,
+                #1d1a18 55%,
+                #171513 100%
+            ) !important;
+        color: #fffdfc !important;
+    }
+
+    section[data-testid="stSidebar"] * {
+        text-shadow: none !important;
+    }
+
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3,
+    section[data-testid="stSidebar"] h4,
+    section[data-testid="stSidebar"] h5,
+    section[data-testid="stSidebar"] h6,
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] span,
+    section[data-testid="stSidebar"] label,
+    section[data-testid="stSidebar"] li,
+    section[data-testid="stSidebar"] small {
+        color: #fffdfc !important;
+        -webkit-text-fill-color: #fffdfc !important;
+        opacity: 1 !important;
+    }
+
+    section[data-testid="stSidebar"]
+    [data-testid="stCaptionContainer"],
+    section[data-testid="stSidebar"]
+    [data-testid="stCaptionContainer"] p {
+        color: #d8d0c8 !important;
+        -webkit-text-fill-color: #d8d0c8 !important;
+        opacity: 1 !important;
+    }
+
+    /* =========================================================
+       Sidebar selectbox labels
+       ========================================================= */
+
+    section[data-testid="stSidebar"] .stSelectbox label,
+    section[data-testid="stSidebar"] .stSelectbox label p {
+        color: #fffdfc !important;
+        -webkit-text-fill-color: #fffdfc !important;
+        opacity: 1 !important;
+        font-weight: 700 !important;
+    }
+
+    /* White selectbox with dark selected text */
+    section[data-testid="stSidebar"]
+    [data-baseweb="select"] > div {
+        background-color: #fffdfc !important;
+        border: 1px solid #d8cec4 !important;
+        box-shadow: none !important;
+    }
+
+    section[data-testid="stSidebar"]
+    [data-baseweb="select"] span,
+    section[data-testid="stSidebar"]
+    [data-baseweb="select"] input,
+    section[data-testid="stSidebar"]
+    [data-baseweb="select"] div[role="button"] {
+        color: #211d1a !important;
+        -webkit-text-fill-color: #211d1a !important;
+        opacity: 1 !important;
+        font-weight: 650 !important;
+    }
+
+    section[data-testid="stSidebar"]
+    [data-baseweb="select"] svg {
+        color: #5b2a3c !important;
+        fill: #5b2a3c !important;
+        stroke: #5b2a3c !important;
+        opacity: 1 !important;
+    }
+
+    /* Dropdown menu is rendered outside the sidebar */
+    [data-baseweb="popover"] {
+        z-index: 999999 !important;
+    }
+
+    [data-baseweb="popover"] [role="listbox"] {
+        background-color: #fffdfc !important;
+    }
+
+    [data-baseweb="popover"] [role="option"],
+    [data-baseweb="popover"] [role="option"] span,
+    [data-baseweb="popover"] [role="option"] div {
+        color: #211d1a !important;
+        -webkit-text-fill-color: #211d1a !important;
+        background-color: #fffdfc !important;
+        opacity: 1 !important;
+    }
+
+    [data-baseweb="popover"]
+    [role="option"]:hover {
+        background-color: #efe7de !important;
+    }
+
+    /* =========================================================
+       Sidebar cards and helper text
+       ========================================================= */
+
+    section[data-testid="stSidebar"]
+    div[style*="border"] {
+        color: #fffdfc !important;
+    }
+
+    section[data-testid="stSidebar"] strong,
+    section[data-testid="stSidebar"] b {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+        opacity: 1 !important;
+    }
+
+    /* =========================================================
+       Sidebar open / close controls
+       ========================================================= */
+
+    [data-testid="stSidebarCollapseButton"] button,
+    [data-testid="stSidebarCollapseButton"] button svg,
+    [data-testid="collapsedControl"] button,
+    [data-testid="collapsedControl"] button svg {
+        color: #fffdfc !important;
+        fill: #fffdfc !important;
+        stroke: #fffdfc !important;
+        opacity: 1 !important;
+    }
+
+    [data-testid="collapsedControl"] button {
+        background-color: #171513 !important;
+        border-radius: 999px !important;
+    }
+
+    /* =========================================================
+       Top navigation tabs
+       ========================================================= */
+
+    [data-testid="stMain"] [data-baseweb="tab-list"] {
+        background-color: #fffdfc !important;
+        border: 1px solid #d8cec4 !important;
+        border-radius: 12px !important;
+        padding: 0.25rem !important;
+    }
+
+    [data-testid="stMain"] [data-baseweb="tab"] {
+        background-color: transparent !important;
+        color: #3a342f !important;
+        -webkit-text-fill-color: #3a342f !important;
+        opacity: 1 !important;
+        font-weight: 650 !important;
+    }
+
+    [data-testid="stMain"] [data-baseweb="tab"] p,
+    [data-testid="stMain"] [data-baseweb="tab"] span {
+        color: #3a342f !important;
+        -webkit-text-fill-color: #3a342f !important;
+        opacity: 1 !important;
+    }
+
+    [data-testid="stMain"]
+    [data-baseweb="tab"][aria-selected="true"] {
+        background-color: #1d1a18 !important;
+        color: #fffdfc !important;
+        border-radius: 9px !important;
+    }
+
+    [data-testid="stMain"]
+    [data-baseweb="tab"][aria-selected="true"] p,
+    [data-testid="stMain"]
+    [data-baseweb="tab"][aria-selected="true"] span {
+        color: #fffdfc !important;
+        -webkit-text-fill-color: #fffdfc !important;
+        opacity: 1 !important;
+    }
+
+    /* Bottom active-tab indicator */
+    [data-testid="stMain"]
+    [data-baseweb="tab-highlight"] {
+        background-color: #b86a45 !important;
+    }
+
+    /* =========================================================
+       Streamlit top header and toolbar
+       ========================================================= */
+
+    header[data-testid="stHeader"] {
+        background-color: rgba(247, 242, 236, 0.98) !important;
+    }
+
+    header[data-testid="stHeader"] button,
+    header[data-testid="stHeader"] button svg {
+        color: #211d1a !important;
+        fill: #211d1a !important;
+        stroke: #211d1a !important;
+        opacity: 1 !important;
+    }
+
+    [data-testid="stToolbar"] {
+        color: #211d1a !important;
+    }
+
+    [data-testid="stToolbar"] button,
+    [data-testid="stToolbar"] button svg {
+        color: #211d1a !important;
+        fill: #211d1a !important;
+        stroke: #211d1a !important;
+        opacity: 1 !important;
+    }
+
+    /* =========================================================
+       Main-page top headings and introductory text
+       ========================================================= */
+
+    [data-testid="stMain"] h1,
+    [data-testid="stMain"] h2,
+    [data-testid="stMain"] h3,
+    [data-testid="stMain"] h4,
+    [data-testid="stMain"] h5,
+    [data-testid="stMain"] h6 {
+        color: #211d1a !important;
+        -webkit-text-fill-color: #211d1a !important;
+        opacity: 1 !important;
+    }
+
+    [data-testid="stMain"] p {
+        opacity: 1;
+    }
+
+    /* =========================================================
+       Mobile-specific improvements
+       ========================================================= */
+
+    @media (max-width: 768px) {
+        section[data-testid="stSidebar"] {
+            width: min(88vw, 360px) !important;
+            min-width: min(88vw, 360px) !important;
+            max-width: min(88vw, 360px) !important;
+        }
+
+        section[data-testid="stSidebar"] > div {
+            width: 100% !important;
+        }
+
+        section[data-testid="stSidebar"] h1,
+        section[data-testid="stSidebar"] h2,
+        section[data-testid="stSidebar"] h3,
+        section[data-testid="stSidebar"] h4 {
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
+            font-weight: 750 !important;
+        }
+
+        section[data-testid="stSidebar"] p,
+        section[data-testid="stSidebar"] span,
+        section[data-testid="stSidebar"] label {
+            opacity: 1 !important;
+        }
+
+        [data-testid="stMain"] [data-baseweb="tab-list"] {
+            overflow-x: auto !important;
+            flex-wrap: nowrap !important;
+            scrollbar-width: none !important;
+            gap: 0.15rem !important;
+        }
+
+        [data-testid="stMain"]
+        [data-baseweb="tab-list"]::-webkit-scrollbar {
+            display: none !important;
+        }
+
+        [data-testid="stMain"] [data-baseweb="tab"] {
+            min-width: max-content !important;
+            padding-left: 0.85rem !important;
+            padding-right: 0.85rem !important;
+            font-size: 0.83rem !important;
+        }
+
+        header[data-testid="stHeader"] {
+            background-color: #f7f2ec !important;
+        }
+    }
+    </style>
+    """
+)
