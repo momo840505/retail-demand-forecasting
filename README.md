@@ -4,19 +4,19 @@
 
 ### Leakage-aware demand forecasting and replenishment decision support for multi-store retail planning
 
-[!\[Live Dashboard](https://img.shields.io/badge/Live%20Dashboard-Open%20App-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://retail-demand-forecasting-momo.streamlit.app)
-[!\[API Documentation](https://img.shields.io/badge/FastAPI-API%20Docs-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://retail-demand-forecasting-api-momo.onrender.com/docs)
+[![Live Dashboard](https://img.shields.io/badge/Live%20Dashboard-Open%20App-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://retail-demand-forecasting-momo.streamlit.app)
+[![API Documentation](https://img.shields.io/badge/FastAPI-API%20Docs-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://retail-demand-forecasting-api-momo.onrender.com/docs)
 
-[!\[Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
-[!\[XGBoost](https://img.shields.io/badge/XGBoost-Forecasting-EB5B25?style=flat-square)](https://xgboost.readthedocs.io/)
-[!\[Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-FF4B4B?style=flat-square&logo=streamlit&logoColor=white)](https://streamlit.io/)
-[!\[FastAPI](https://img.shields.io/badge/FastAPI-REST%20API-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[!\[Pytest](https://img.shields.io/badge/Pytest-Tested-0A9EDC?style=flat-square&logo=pytest&logoColor=white)](https://docs.pytest.org/)
-[!\[Python Tests](https://github.com/momo840505/retail-demand-forecasting/actions/workflows/tests.yml/badge.svg)](https://github.com/momo840505/retail-demand-forecasting/actions/workflows/tests.yml)
+[![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![XGBoost](https://img.shields.io/badge/XGBoost-Forecasting-EB5B25?style=flat-square)](https://xgboost.readthedocs.io/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-FF4B4B?style=flat-square&logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-REST%20API-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Pytest](https://img.shields.io/badge/Pytest-Tested-0A9EDC?style=flat-square&logo=pytest&logoColor=white)](https://docs.pytest.org/)
+[![Python Tests](https://github.com/momo840505/retail-demand-forecasting/actions/workflows/tests.yml/badge.svg)](https://github.com/momo840505/retail-demand-forecasting/actions/workflows/tests.yml)
 
 </div>
 
-\---
+---
 
 ## 📌 Project Overview
 
@@ -33,9 +33,9 @@ This project delivers an end-to-end retail forecasting and decision-support plat
 * provides forecast and replenishment endpoints through FastAPI;
 * validates the codebase using pytest and GitHub Actions.
 
-> \\\*\\\*Important:\\\*\\\* The deployed application is a historical portfolio demonstration. It displays prepared forecasts for 16 August 2017 to 31 August 2017 and is not connected to a live retailer inventory system.
+> **Important:** The deployed application is a historical portfolio demonstration. It displays prepared forecasts for 16 August 2017 to 31 August 2017 and is not connected to a live retailer inventory system.
 
-\---
+---
 
 ## 🚀 Live Applications
 
@@ -57,7 +57,7 @@ Access model metadata, store references, product families, store-family forecast
 
 > The API is hosted on a free Render instance. The first request after inactivity may take longer while the service starts.
 
-\---
+---
 
 ## 🖼️ Dashboard Preview
 
@@ -65,21 +65,21 @@ Access model metadata, store references, product families, store-family forecast
 
 The network view summarizes expected demand across all stores and product families.
 
-!\[Network Pulse](docs/images/dashboard-network-pulse.png)
+![Network Pulse](docs/images/dashboard-network-pulse.png)
 
 ### Store Story
 
 The store-level view shows historical demand and the next 16 days of expected sales for the selected store and product family.
 
-!\[Store Story](docs/images/dashboard-store-story.png)
+![Store Story](docs/images/dashboard-store-story.png)
 
 ### Stock Decision
 
 The replenishment workspace converts forecast demand and inventory assumptions into a practical ordering recommendation.
 
-!\[Stock Decision](docs/images/dashboard-stock-decision.png)
+![Stock Decision](docs/images/dashboard-stock-decision.png)
 
-\---
+---
 
 ## ✨ Key Features
 
@@ -144,14 +144,14 @@ The replenishment workspace converts forecast demand and inventory assumptions i
 * Python 3.11 deployment configuration
 * separate Streamlit and API deployments
 
-\---
+---
 
 ## 📊 Model Performance
 
 The final model was evaluated using four chronological 16-day validation periods.
 
-|Metric|Result|
-|-|-:|
+| Metric | Result |
+|---|---:|
 |Pooled WAPE|**12.78%**|
 |Pooled RMSLE|**0.3877**|
 |WAPE improvement over best baseline|**24.50%**|
@@ -167,25 +167,25 @@ The final model was evaluated using four chronological 16-day validation periods
 
 **RMSLE** evaluates proportional error after log transformation and reduces the influence of very large sales values.
 
-\---
+---
 
 ## 🧠 Forecasting Methodology
 
-### 1\. Data Preparation
+### 1. Data Preparation
 
 The modeling dataset combines historical sales, store numbers, product families, promotions, store metadata, holidays, events, oil-price history, and calendar variables.
 
-### 2\. Horizon-Safe Feature Engineering
+### 2. Horizon-Safe Feature Engineering
 
 The forecast horizon is 16 days. Features therefore use only information available before the forecast period begins.
 
 Examples include:
 
-* `sales\\\_lag\\\_16`
-* `sales\\\_lag\\\_21`
-* `sales\\\_lag\\\_28`
-* `sales\\\_lag\\\_35`
-* `sales\\\_lag\\\_364`
+* `sales_lag_16`
+* `sales_lag_21`
+* `sales_lag_28`
+* `sales_lag_35`
+* `sales_lag_364`
 * shifted rolling mean
 * shifted rolling standard deviation
 * historical oil-price features
@@ -193,7 +193,7 @@ Examples include:
 
 Any lag shorter than the forecast horizon is rejected by the feature-engineering logic.
 
-### 3\. Chronological Backtesting
+### 3. Chronological Backtesting
 
 The project uses:
 
@@ -203,7 +203,7 @@ The project uses:
 * a separate 16-day inner validation period;
 * outer validation periods used only for final evaluation.
 
-### 4\. Baseline Comparison
+### 4. Baseline Comparison
 
 The XGBoost model is compared against:
 
@@ -213,35 +213,41 @@ The XGBoost model is compared against:
 * weekly seasonal naive forecast;
 * shifted 28-day mean forecast.
 
-### 5\. Final Forecast
+### 5. Final Forecast
 
 After chronological evaluation, the final model produces a 16-day forecast for every store and product-family combination in the deployment dataset.
 
-\---
+---
 
 ## 🏗️ System Architecture
 
 ```mermaid
-flowchart LR
-    A\\\[Raw Retail Data] --> B\\\[Data Validation]
-    B --> C\\\[Modeling Dataset]
-    C --> D\\\[Horizon-Safe Features]
-    D --> E\\\[Baseline Backtesting]
-    D --> F\\\[XGBoost Backtesting]
-    E --> G\\\[Model Comparison]
+flowchart TD
+    A[Raw Retail Data] --> B[Data Validation]
+    B --> C[Modeling Dataset]
+    C --> D[Horizon-Safe Features]
+
+    D --> E[Baseline Backtesting]
+    D --> F[XGBoost Backtesting]
+
+    E --> G[Model Comparison]
     F --> G
-    G --> H\\\[Final Model]
-    H --> I\\\[Prepared Forecast Data]
-    I --> J\\\[Streamlit Dashboard]
-    I --> K\\\[FastAPI Service]
-    J --> L\\\[Replenishment Planner]
+
+    G --> H[Final Model]
+    H --> I[Prepared Forecast Data]
+
+    I --> J[Streamlit Dashboard]
+    I --> K[FastAPI Service]
+
+    J --> L[Replenishment Planner]
     K --> L
-    M\\\[Pytest] --> N\\\[GitHub Actions]
+
+    M[Pytest] --> N[GitHub Actions]
     N --> J
     N --> K
 ```
 
-\---
+---
 
 ## 📦 Replenishment Logic
 
@@ -274,12 +280,12 @@ Target Inventory Level − Inventory Position
 
 The final suggested quantity also applies non-negative order constraints, minimum order quantity, case-pack rounding, and forecast coverage validation.
 
-\---
+---
 
 ## ⚡ API Endpoints
 
-|Method|Endpoint|Description|
-|-|-|-|
+| Method | Endpoint | Description |
+|---|---|---|
 |GET|`/`|Return API service information|
 |GET|`/health`|Verify API and forecast-data availability|
 |GET|`/model-info`|Return model and validation information|
@@ -291,22 +297,22 @@ The final suggested quantity also applies non-negative order constraints, minimu
 ### Forecast Request Example
 
 ```text
-GET /forecasts?store\\\_nbr=1\\\&family=AUTOMOTIVE
+GET /forecasts?store_nbr=1&family=AUTOMOTIVE
 ```
 
 ### Replenishment Request Example
 
 ```json
 {
-  "store\\\_nbr": 1,
+  "store_nbr": 1,
   "family": "AUTOMOTIVE",
-  "current\\\_inventory": 20,
-  "inbound\\\_inventory": 0,
-  "lead\\\_time\\\_days": 3,
-  "safety\\\_stock\\\_days": 2,
-  "review\\\_period\\\_days": 7,
-  "case\\\_pack\\\_size": 6,
-  "minimum\\\_order\\\_quantity": 12
+  "current_inventory": 20,
+  "inbound_inventory": 0,
+  "lead_time_days": 3,
+  "safety_stock_days": 2,
+  "review_period_days": 7,
+  "case_pack_size": 6,
+  "minimum_order_quantity": 12
 }
 ```
 
@@ -316,7 +322,7 @@ Interactive API documentation:
 https://retail-demand-forecasting-api-momo.onrender.com/docs
 ```
 
-\---
+---
 
 ## 🗂️ Project Structure
 
@@ -329,7 +335,7 @@ retail-demand-forecasting/
 ├── .streamlit/
 │   └── config.toml
 ├── api/
-│   ├── \\\_\\\_init\\\_\\\_.py
+│   ├── __init__.py
 │   └── main.py
 ├── dashboard/
 │   ├── app.py
@@ -340,13 +346,13 @@ retail-demand-forecasting/
 │   │   ├── dashboard-network-pulse.png
 │   │   ├── dashboard-stock-decision.png
 │   │   └── dashboard-store-story.png
-│   ├── backtesting\\\_strategy.md
-│   ├── data\\\_source.md
-│   ├── feature\\\_availability.md
-│   └── replenishment\\\_assumptions.md
+│   ├── backtesting_strategy.md
+│   ├── data_source.md
+│   ├── feature_availability.md
+│   └── replenishment_assumptions.md
 ├── scripts/
 ├── src/
-│   └── retail\\\_forecasting/
+│   └── retail_forecasting/
 ├── tests/
 ├── .python-version
 ├── pyproject.toml
@@ -355,24 +361,24 @@ retail-demand-forecasting/
 └── README.md
 ```
 
-\---
+---
 
 ## 🛠️ Local Installation
 
-### 1\. Clone the Repository
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/momo840505/retail-demand-forecasting.git
 cd retail-demand-forecasting
 ```
 
-### 2\. Create a Virtual Environment
+### 2. Create a Virtual Environment
 
 #### Windows PowerShell
 
 ```powershell
 python -m venv .venv
-.\\\\.venv\\\\Scripts\\\\Activate.ps1
+.\.venv\Scripts\Activate.ps1
 ```
 
 #### macOS or Linux
@@ -382,7 +388,7 @@ python -m venv .venv
 source .venv/bin/activate
 ```
 
-### 3\. Install Dependencies
+### 3. Install Dependencies
 
 ```bash
 python -m pip install --upgrade pip
@@ -390,7 +396,7 @@ python -m pip install -r requirements-dev.txt
 python -m pip install -e .
 ```
 
-\---
+---
 
 ## ▶️ Run the Dashboard
 
@@ -404,7 +410,7 @@ Local URL:
 http://localhost:8501
 ```
 
-\---
+---
 
 ## ▶️ Run the API
 
@@ -424,7 +430,7 @@ Health check:
 http://127.0.0.1:8000/health
 ```
 
-\---
+---
 
 ## 🧪 Testing
 
@@ -448,21 +454,21 @@ python -c "from api.main import app; print(app.title)"
 
 GitHub Actions automatically runs the test workflow for pushes and pull requests targeting `main`.
 
-\---
+---
 
 ## 🔄 Rebuild the Forecasting Pipeline
 
 ```bash
-python scripts/verify\\\_raw\\\_data.py
-python scripts/profile\\\_data.py
-python scripts/build\\\_modeling\\\_dataset.py
-python scripts/run\\\_baseline\\\_backtest.py
-python scripts/run\\\_xgboost\\\_backtest.py
-python scripts/train\\\_final\\\_model.py
-python scripts/prepare\\\_dashboard\\\_data.py
+python scripts/verify_raw_data.py
+python scripts/profile_data.py
+python scripts/build_modeling_dataset.py
+python scripts/run_baseline_backtest.py
+python scripts/run_xgboost_backtest.py
+python scripts/train_final_model.py
+python scripts/prepare_dashboard_data.py
 ```
 
-\---
+---
 
 ## 📚 Data Source
 
@@ -472,7 +478,7 @@ This project uses data from the Kaggle competition:
 
 The original competition files are not included in this repository.
 
-\---
+---
 
 ## ⚠️ Limitations
 
@@ -485,7 +491,7 @@ The original competition files are not included in this repository.
 * Replenishment recommendations are decision support only.
 * The Render API may take longer to respond after inactivity on the free hosting plan.
 
-\---
+---
 
 ## 🔭 Future Improvements
 
@@ -501,7 +507,7 @@ The original competition files are not included in this repository.
 * individual forecast explainability;
 * automated data ingestion.
 
-\---
+---
 
 ## 💼 Portfolio Highlights
 
@@ -521,7 +527,7 @@ This project demonstrates experience in:
 * cloud deployment;
 * responsive web design.
 
-\---
+---
 
 <div align="center">
 
