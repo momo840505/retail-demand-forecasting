@@ -872,7 +872,259 @@ div[data-baseweb="select"] > div,
 """
 )
 
+# =============================================================================
+# Responsive readability fixes
+# =============================================================================
 
+st.html(
+    """
+    <style>
+    /* =========================================================
+       Main workspace text
+       ========================================================= */
+
+    [data-testid="stMain"] .stMarkdown h1,
+    [data-testid="stMain"] .stMarkdown h2,
+    [data-testid="stMain"] .stMarkdown h3,
+    [data-testid="stMain"] .stMarkdown h4,
+    [data-testid="stMain"] .stMarkdown h5,
+    [data-testid="stMain"] .stMarkdown h6 {
+        color: #1f1c19 !important;
+        opacity: 1 !important;
+    }
+
+    [data-testid="stMain"] .stMarkdown p,
+    [data-testid="stMain"] .stMarkdown li {
+        color: #3f3934;
+    }
+
+    [data-testid="stMain"] [data-testid="stCaptionContainer"],
+    [data-testid="stMain"] [data-testid="stCaptionContainer"] p {
+        color: #746e68 !important;
+        opacity: 1 !important;
+    }
+
+    /* =========================================================
+       Expander header and body
+       ========================================================= */
+
+    [data-testid="stMain"] [data-testid="stExpander"] {
+        border-color: #d7cec5 !important;
+        background: rgba(255, 253, 250, 0.58) !important;
+    }
+
+    [data-testid="stMain"] [data-testid="stExpander"] summary {
+        background: #eeeae6 !important;
+    }
+
+    [data-testid="stMain"] [data-testid="stExpander"] summary,
+    [data-testid="stMain"] [data-testid="stExpander"] summary p,
+    [data-testid="stMain"] [data-testid="stExpander"] summary span,
+    [data-testid="stMain"] [data-testid="stExpander"] summary svg {
+        color: #302b27 !important;
+        fill: #302b27 !important;
+        -webkit-text-fill-color: #302b27 !important;
+        opacity: 1 !important;
+    }
+
+    [data-testid="stMain"] [data-testid="stExpanderDetails"],
+    [data-testid="stMain"] [data-testid="stExpanderDetails"] p,
+    [data-testid="stMain"] [data-testid="stExpanderDetails"] li,
+    [data-testid="stMain"] [data-testid="stExpanderDetails"] span {
+        color: #3f3934 !important;
+        -webkit-text-fill-color: #3f3934 !important;
+        opacity: 1 !important;
+    }
+
+    /* =========================================================
+       Widget labels in light workspace
+       ========================================================= */
+
+    [data-testid="stMain"] .stNumberInput label,
+    [data-testid="stMain"] .stNumberInput label p,
+    [data-testid="stMain"] .stSelectbox label,
+    [data-testid="stMain"] .stSelectbox label p,
+    [data-testid="stMain"] .stSlider label,
+    [data-testid="stMain"] .stSlider label p,
+    [data-testid="stMain"] .stToggle label,
+    [data-testid="stMain"] .stToggle label p {
+        color: #39332e !important;
+        -webkit-text-fill-color: #39332e !important;
+        opacity: 1 !important;
+        font-weight: 600 !important;
+    }
+
+    /* =========================================================
+       Number input: light box with dark text
+       ========================================================= */
+
+    [data-testid="stMain"] .stNumberInput [data-baseweb="input"] {
+        background-color: #f1f3f6 !important;
+        border-color: #d6d9de !important;
+    }
+
+    [data-testid="stMain"] .stNumberInput input {
+        background-color: #f1f3f6 !important;
+        color: #25211e !important;
+        -webkit-text-fill-color: #25211e !important;
+        caret-color: #25211e !important;
+        opacity: 1 !important;
+        font-weight: 600 !important;
+    }
+
+    [data-testid="stMain"] .stNumberInput button {
+        background-color: #f1f3f6 !important;
+        color: #47413c !important;
+        border-color: #d6d9de !important;
+        opacity: 1 !important;
+    }
+
+    [data-testid="stMain"] .stNumberInput button svg {
+        color: #47413c !important;
+        fill: #47413c !important;
+        stroke: #47413c !important;
+        opacity: 1 !important;
+    }
+
+    [data-testid="stMain"] .stNumberInput button:disabled,
+    [data-testid="stMain"] .stNumberInput button:disabled svg {
+        color: #9a948e !important;
+        fill: #9a948e !important;
+        stroke: #9a948e !important;
+        opacity: 0.7 !important;
+    }
+
+    /* Help icon beside labels */
+    [data-testid="stMain"] [data-testid="stTooltipIcon"],
+    [data-testid="stMain"] [data-testid="stTooltipIcon"] svg {
+        color: #6e6862 !important;
+        fill: #6e6862 !important;
+        stroke: #6e6862 !important;
+        opacity: 1 !important;
+    }
+
+    /* =========================================================
+       Sidebar select boxes
+       ========================================================= */
+
+    section[data-testid="stSidebar"] .stSelectbox label,
+    section[data-testid="stSidebar"] .stSelectbox label p {
+        color: #fffdfc !important;
+        -webkit-text-fill-color: #fffdfc !important;
+        opacity: 1 !important;
+    }
+
+    section[data-testid="stSidebar"] [data-baseweb="select"] > div {
+        background-color: #fffdfc !important;
+        border-color: #ddd3c8 !important;
+    }
+
+    section[data-testid="stSidebar"] [data-baseweb="select"] span,
+    section[data-testid="stSidebar"] [data-baseweb="select"] input {
+        color: #211d1a !important;
+        -webkit-text-fill-color: #211d1a !important;
+        opacity: 1 !important;
+    }
+
+    section[data-testid="stSidebar"] [data-baseweb="select"] svg {
+        color: #5b2a3c !important;
+        fill: #5b2a3c !important;
+        stroke: #5b2a3c !important;
+        opacity: 1 !important;
+    }
+
+    [data-baseweb="popover"] [role="option"],
+    [data-baseweb="popover"] [role="option"] span {
+        color: #211d1a !important;
+        -webkit-text-fill-color: #211d1a !important;
+        opacity: 1 !important;
+    }
+
+    /* =========================================================
+       Mobile layout
+       ========================================================= */
+
+    @media (max-width: 768px) {
+        [data-testid="stMainBlockContainer"] {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+            padding-top: 1rem !important;
+            padding-bottom: 5rem !important;
+        }
+
+        section[data-testid="stSidebar"] {
+            width: min(88vw, 360px) !important;
+            min-width: min(88vw, 360px) !important;
+            max-width: min(88vw, 360px) !important;
+        }
+
+        section[data-testid="stSidebar"] > div {
+            width: 100% !important;
+        }
+
+        [data-testid="stMain"] [data-testid="column"] {
+            min-width: 100% !important;
+            width: 100% !important;
+            flex: 1 1 100% !important;
+        }
+
+        [data-testid="stMain"] .stMarkdown h5 {
+            color: #1f1c19 !important;
+            font-size: 1.15rem !important;
+            line-height: 1.3 !important;
+            margin-top: 1rem !important;
+            margin-bottom: 0.7rem !important;
+        }
+
+        [data-testid="stMain"] .stNumberInput label,
+        [data-testid="stMain"] .stNumberInput label p {
+            color: #39332e !important;
+            -webkit-text-fill-color: #39332e !important;
+            font-size: 0.92rem !important;
+            font-weight: 650 !important;
+            line-height: 1.35 !important;
+        }
+
+        [data-testid="stMain"] .stNumberInput input {
+            color: #25211e !important;
+            -webkit-text-fill-color: #25211e !important;
+            font-size: 1rem !important;
+            font-weight: 650 !important;
+        }
+
+        [data-testid="stMain"] .stNumberInput button,
+        [data-testid="stMain"] .stNumberInput button svg {
+            color: #47413c !important;
+            fill: #47413c !important;
+            stroke: #47413c !important;
+        }
+
+        [data-testid="stMain"] .stNumberInput {
+            margin-bottom: 0.8rem !important;
+        }
+
+        [data-testid="stMain"] [data-testid="stExpander"] summary,
+        [data-testid="stMain"] [data-testid="stExpander"] summary p,
+        [data-testid="stMain"] [data-testid="stExpander"] summary span {
+            color: #302b27 !important;
+            -webkit-text-fill-color: #302b27 !important;
+            font-weight: 650 !important;
+        }
+
+        [data-testid="stMain"] [data-testid="stExpanderDetails"] {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+            padding-bottom: 1rem !important;
+        }
+
+        [data-testid="stStatusWidget"],
+        [data-testid="stDecoration"] {
+            display: none !important;
+        }
+    }
+    </style>
+    """
+)
 # =============================================================================
 # Data and labels
 # =============================================================================
