@@ -19,3 +19,7 @@ models/*.pkl
 models/*.joblib
 artifacts/*.pkl
 artifacts/*.joblib
+
+# Generated production artifacts
+artifacts/models/
+artifacts/predictions/
