@@ -24,6 +24,7 @@ This repository includes additional model documentation for portfolio and interv
 
 - [Model card](docs/model_card.md)
 - [Error analysis](docs/error_analysis.md)
+- [Monitoring plan](docs/monitoring_plan.md)
 
 These notes clarify the model's intended use, evaluation design, limitations, and recommended production extensions.
 
@@ -561,5 +562,4 @@ This project demonstrates experience in:
 [GitHub Repository](https://github.com/momo840505/retail-demand-forecasting)
 
 </div>
-
 
