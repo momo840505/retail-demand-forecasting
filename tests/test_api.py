@@ -47,6 +47,21 @@ def test_model_info_endpoint() -> None:
     assert result["pooled_rmsle"] > 0
 
 
+def test_monitoring_info_endpoint() -> None:
+    response = client.get("/monitoring-info")
+
+    assert response.status_code == 200
+
+    result = response.json()
+
+    assert result["model_version"] == "xgboost_log_target_nested"
+    assert "forecast_row_count" in result["monitored_signals"]
+    assert result["data_quality_checks"]
+    assert result["model_quality_checks"]
+    assert result["operational_checks"]
+    assert result["retraining_triggers"]
+
+
 def test_forecast_endpoint() -> None:
     store_nbr, family = get_valid_selection()
 

@@ -62,6 +62,15 @@ class ModelInfoResponse(BaseModel):
     test_labels_available: bool
 
 
+class MonitoringInfoResponse(BaseModel):
+    model_version: str
+    monitored_signals: list[str]
+    data_quality_checks: list[str]
+    model_quality_checks: list[str]
+    operational_checks: list[str]
+    retraining_triggers: list[str]
+
+
 class ForecastPoint(BaseModel):
     date: date
     predicted_sales: float
@@ -323,6 +332,7 @@ def read_root() -> dict[str, str]:
         "service": "Retail Demand Forecasting API",
         "documentation": "/docs",
         "health": "/health",
+        "monitoring": "/monitoring-info",
     }
 
 
@@ -399,6 +409,55 @@ def get_model_info() -> ModelInfoResponse:
         test_labels_available=bool(
             manifest["test_labels_available"]
         ),
+    )
+
+
+@app.get(
+    "/monitoring-info",
+    response_model=MonitoringInfoResponse,
+    tags=["Model"],
+)
+def get_monitoring_info() -> MonitoringInfoResponse:
+    """Return production monitoring signals for the forecasting demo."""
+
+    api_data = get_api_data()
+    model_summary = api_data["summary"]
+
+    return MonitoringInfoResponse(
+        model_version=str(model_summary["model"]),
+        monitored_signals=[
+            "forecast_row_count",
+            "forecast_date_range",
+            "store_family_coverage",
+            "negative_or_missing_forecasts",
+            "api_latency_ms",
+            "api_error_rate",
+        ],
+        data_quality_checks=[
+            "required forecast columns are present",
+            "forecast dates are parseable",
+            "store numbers are numeric",
+            "predicted sales are numeric and non-negative",
+            "promotion flags are numeric",
+        ],
+        model_quality_checks=[
+            "WAPE trend by validation fold",
+            "RMSLE trend by validation fold",
+            "forecast bias by store-family",
+            "baseline comparison drift",
+        ],
+        operational_checks=[
+            "dashboard data files are available",
+            "API health endpoint returns ok",
+            "Render cold-start latency is documented",
+            "replenishment requests have complete forecast coverage",
+        ],
+        retraining_triggers=[
+            "new sales history becomes available",
+            "forecast bias exceeds agreed threshold",
+            "WAPE deteriorates against baseline",
+            "store or product-family coverage changes materially",
+        ],
     )
 
 
