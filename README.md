@@ -18,6 +18,17 @@
 
 ---
 
+## Portfolio Engineering Notes
+
+This repository includes additional model documentation for portfolio and interview review:
+
+- [Model card](docs/model_card.md)
+- [Error analysis](docs/error_analysis.md)
+
+These notes clarify the model's intended use, evaluation design, limitations, and recommended production extensions.
+
+---
+
 ## 📌 Project Overview
 
 Retail demand changes with seasonality, promotions, holidays, store characteristics, and customer behaviour. Poor demand planning can lead to stockouts, excess inventory, and inefficient replenishment decisions.
@@ -550,6 +561,5 @@ This project demonstrates experience in:
 [GitHub Repository](https://github.com/momo840505/retail-demand-forecasting)
 
 </div>
-
 
 
