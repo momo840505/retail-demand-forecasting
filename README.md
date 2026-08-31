@@ -6,6 +6,7 @@
 
 [![Live Dashboard](https://img.shields.io/badge/Live%20Dashboard-Open%20App-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://retail-demand-forecasting-momo.streamlit.app)
 [![API Documentation](https://img.shields.io/badge/FastAPI-API%20Docs-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://retail-demand-forecasting-api-momo.onrender.com/docs)
+[![AWS Elastic Beanstalk](https://img.shields.io/badge/AWS-Live%20on%20Elastic%20Beanstalk-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)](http://retail-forecast-env.eba-vwkt2222.ap-southeast-2.elasticbeanstalk.com/docs)
 
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![XGBoost](https://img.shields.io/badge/XGBoost-Forecasting-EB5B25?style=flat-square)](https://xgboost.readthedocs.io/)
@@ -68,6 +69,15 @@ Access model metadata, store references, product families, store-family forecast
 👉 [Check API Status](https://retail-demand-forecasting-api-momo.onrender.com/health)
 
 > The API is hosted on a free Render instance. The first request after inactivity may take longer while the service starts.
+
+### Forecasting API — AWS Deployment
+
+The same read-only forecasting/replenishment API is also containerised and deployed to **AWS Elastic Beanstalk** (Docker platform, single-instance `t3.micro` environment, `ap-southeast-2`), separately from the Render deployment above. This mirrors how the platform would actually run in a production AWS environment rather than only demonstrating infrastructure-as-code that was never applied.
+
+👉 [Open the AWS-hosted API docs](http://retail-forecast-env.eba-vwkt2222.ap-southeast-2.elasticbeanstalk.com/docs)
+👉 [Check AWS API health](http://retail-forecast-env.eba-vwkt2222.ap-southeast-2.elasticbeanstalk.com/health)
+
+Deployment artefacts: [`Dockerfile`](Dockerfile) (image includes only the API's runtime dependencies, listed separately in [`requirements-api.txt`](requirements-api.txt), rather than the full training/dashboard toolchain) and the standard Elastic Beanstalk CLI workflow (`eb init`, `eb create --single --instance-type t3.micro`, `eb deploy`).
 
 ---
 
