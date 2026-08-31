@@ -1,0 +1,10 @@
+# Minimal runtime dependencies for the FastAPI service only.
+# (The full requirements.txt also pulls in streamlit, matplotlib, xgboost,
+# pytest, etc. -- those are needed for training/dashboard/dev work, but the
+# API itself only reads pre-computed forecast/replenishment data, so it
+# doesn't need them. A smaller image builds faster and deploys faster.)
+fastapi==0.138.0
+uvicorn[standard]==0.49.0
+pandas==3.0.3
+pyarrow==24.0.0
+pydantic==2.13.4
