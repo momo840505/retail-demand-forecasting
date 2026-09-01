@@ -27,6 +27,7 @@ This repository includes additional model documentation for portfolio and interv
 - [Model card](docs/model_card.md)
 - [Error analysis](docs/error_analysis.md)
 - [Monitoring plan](docs/monitoring_plan.md)
+- [Experiment design: promotion A/B test](docs/experiment_design_promotion_test.md)
 
 These notes clarify the model's intended use, evaluation design, limitations, and recommended production extensions.
 
@@ -197,6 +198,16 @@ The final model was evaluated using four chronological 16-day validation periods
 **WAPE** measures total absolute forecast error relative to total demand and is useful for operational planning.
 
 **RMSLE** evaluates proportional error after log transformation and reduces the influence of very large sales values.
+
+---
+
+## 🧪 Experimentation: Promotion A/B Test Design
+
+The historical data includes a promotion flag, and a naive comparison shows a large average-sales difference between promoted and non-promoted records. That comparison is confounded (promotions are chosen, not randomly assigned) and is not treated as evidence of a causal effect in this project.
+
+Instead, [`experiments/promotion_lift_analysis.py`](experiments/promotion_lift_analysis.py) uses the historical daily-sales series to estimate real baseline variability and day-of-week seasonality, then computes the sample size a genuinely randomized store-level promotion test would need, comparing a naive design against a randomized block design that blocks on day-of-week. Blocking is shown to reduce the residual variance by 21%, which is a concrete, data-grounded reason to prefer it over simple randomization.
+
+The full design -- hypothesis, randomization unit, primary/guardrail metrics, power calculation, analysis plan, and the risks (novelty effects, spillover between nearby stores, calendar confounds) -- is written up in [`docs/experiment_design_promotion_test.md`](docs/experiment_design_promotion_test.md).
 
 ---
 
