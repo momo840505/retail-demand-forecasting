@@ -41,7 +41,7 @@ jobs:
         run: python -m pytest -q
 
       - name: Compile Python files
-        run: python -m compileall -q api dashboard src
+        run: python -m compileall -q api dashboard src experiments
 
       - name: Verify FastAPI application
         run: python -c "from api.main import app; print(app.title)"
