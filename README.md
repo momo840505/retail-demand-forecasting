@@ -7,6 +7,7 @@
 [![Live Dashboard](https://img.shields.io/badge/Live%20Dashboard-Open%20App-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://retail-demand-forecasting-momo.streamlit.app)
 [![API Documentation](https://img.shields.io/badge/FastAPI-API%20Docs-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://retail-demand-forecasting-api-momo.onrender.com/docs)
 [![AWS Elastic Beanstalk](https://img.shields.io/badge/AWS-Live%20on%20Elastic%20Beanstalk-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)](http://retail-forecast-env.eba-vwkt2222.ap-southeast-2.elasticbeanstalk.com/docs)
+[![Tableau Public](https://img.shields.io/badge/Tableau-Executive%20Dashboard-E97627?style=for-the-badge&logo=tableau&logoColor=white)](https://public.tableau.com/app/profile/wei.ting.mo/viz/RetailDemandForecastingExecutiveOverview/RetailDemandForecastingExecutiveOverview)
 
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![XGBoost](https://img.shields.io/badge/XGBoost-Forecasting-EB5B25?style=flat-square)](https://xgboost.readthedocs.io/)
@@ -78,6 +79,14 @@ The same read-only forecasting/replenishment API is also containerised and deplo
 👉 [Check AWS API health](http://retail-forecast-env.eba-vwkt2222.ap-southeast-2.elasticbeanstalk.com/health)
 
 Deployment artefacts: [`Dockerfile`](Dockerfile) (image includes only the API's runtime dependencies, listed separately in [`requirements-api.txt`](requirements-api.txt), rather than the full training/dashboard toolchain) and the standard Elastic Beanstalk CLI workflow (`eb init`, `eb create --single --instance-type t3.micro`, `eb deploy`).
+
+### Executive Summary Dashboard (Tableau Public)
+
+A separate, business-facing summary dashboard built in Tableau, alongside the technical Streamlit dashboard above. It covers the historical sales trend, the top-selling product categories, and the measured effect of promotions on average sales -- the kind of high-level view a non-technical stakeholder (e.g. a merchandising or operations lead) would use, rather than the store/family-level forecast detail the Streamlit app exposes.
+
+👉 [Open the Tableau Public dashboard](https://public.tableau.com/app/profile/wei.ting.mo/viz/RetailDemandForecastingExecutiveOverview/RetailDemandForecastingExecutiveOverview)
+
+Built directly from the same historical sales summaries (`reports/data/`) produced during the data-preparation stage of this project, before any modelling.
 
 ---
 
