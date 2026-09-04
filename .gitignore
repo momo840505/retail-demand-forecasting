@@ -23,3 +23,8 @@ artifacts/*.joblib
 # Generated production artifacts
 artifacts/models/
 artifacts/predictions/
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
