@@ -22,33 +22,33 @@
 
 ## Portfolio Engineering Notes
 
-This repository includes additional model documentation for portfolio and interview review:
+I wrote up a few extra docs alongside the code, mostly so I have something solid to point to when an interviewer asks "okay, how would this actually behave in production":
 
 - [Model card](docs/model_card.md)
 - [Error analysis](docs/error_analysis.md)
 - [Monitoring plan](docs/monitoring_plan.md)
 - [Experiment design: promotion A/B test](docs/experiment_design_promotion_test.md)
 
-These notes clarify the model's intended use, evaluation design, limitations, and recommended production extensions.
+They cover what the model is (and isn't) meant for, how it was evaluated, where it falls short, and what I'd add before trusting it with real inventory decisions.
 
 ---
 
 ## 📌 Project Overview
 
-Retail demand changes with seasonality, promotions, holidays, store characteristics, and customer behaviour. Poor demand planning can lead to stockouts, excess inventory, and inefficient replenishment decisions.
+Retail demand moves around with seasonality, promotions, holidays, store-level quirks, and plain customer behaviour — get it wrong and you end up either with empty shelves or a warehouse full of stock nobody's buying. I spent a few years on the sales/order-management side of international trade before switching into data science, so "bad demand planning costs real money" wasn't an abstract idea to me going into this.
 
-This project delivers an end-to-end retail forecasting and decision-support platform that:
+So instead of stopping at "here's a model with a decent error rate," I wanted to build the whole path from raw sales data to an actual ordering decision. The project:
 
 * forecasts daily product-family demand for individual stores;
-* evaluates models using chronological backtesting;
+* evaluates models using chronological backtesting (never shuffling dates — more on why below);
 * prevents target leakage with horizon-safe feature engineering;
-* compares XGBoost against transparent baseline methods;
+* compares XGBoost against transparent baseline methods, so the improvement is provable rather than assumed;
 * converts demand forecasts into replenishment recommendations;
 * exposes results through an interactive Streamlit dashboard;
-* provides forecast and replenishment endpoints through FastAPI;
-* validates the codebase using pytest and GitHub Actions.
+* serves forecast and replenishment endpoints through FastAPI;
+* gets checked by pytest and GitHub Actions on every push.
 
-> **Important:** The deployed application is a historical portfolio demonstration. It displays prepared forecasts for 16 August 2017 to 31 August 2017 and is not connected to a live retailer inventory system.
+> **Important:** The deployed app is a historical portfolio demo — it shows prepared forecasts for 16 August 2017 to 31 August 2017 and isn't wired up to a live retailer's inventory system.
 
 ---
 
@@ -74,20 +74,20 @@ Access model metadata, store references, product families, store-family forecast
 
 ### Forecasting API — AWS Deployment
 
-The same read-only forecasting/replenishment API is also containerised and deployed to **AWS Elastic Beanstalk** (Docker platform, single-instance `t3.micro` environment, `ap-southeast-2`), separately from the Render deployment above. This mirrors how the platform would actually run in a production AWS environment rather than only demonstrating infrastructure-as-code that was never applied.
+I also containerised the same read-only forecasting/replenishment API and deployed it separately to **AWS Elastic Beanstalk** (Docker platform, single-instance `t3.micro`, `ap-southeast-2`), alongside the Render deployment above. I wanted an AWS deployment I'd actually run myself, not just an infrastructure-as-code file sitting in the repo that never got applied.
 
 👉 [Open the AWS-hosted API docs](http://retail-forecast-env.eba-vwkt2222.ap-southeast-2.elasticbeanstalk.com/docs)
 👉 [Check AWS API health](http://retail-forecast-env.eba-vwkt2222.ap-southeast-2.elasticbeanstalk.com/health)
 
-Deployment artefacts: [`Dockerfile`](Dockerfile) (image includes only the API's runtime dependencies, listed separately in [`requirements-api.txt`](requirements-api.txt), rather than the full training/dashboard toolchain) and the standard Elastic Beanstalk CLI workflow (`eb init`, `eb create --single --instance-type t3.micro`, `eb deploy`).
+Deployment files: [`Dockerfile`](Dockerfile) — the image only pulls in the API's runtime dependencies (listed separately in [`requirements-api.txt`](requirements-api.txt)) instead of the full training/dashboard toolchain, so it builds faster — and the standard Elastic Beanstalk CLI flow (`eb init`, `eb create --single --instance-type t3.micro`, `eb deploy`).
 
 ### Executive Summary Dashboard (Tableau Public)
 
-A separate, business-facing summary dashboard built in Tableau, alongside the technical Streamlit dashboard above. It covers the historical sales trend, the top-selling product categories, and the measured effect of promotions on average sales -- the kind of high-level view a non-technical stakeholder (e.g. a merchandising or operations lead) would use, rather than the store/family-level forecast detail the Streamlit app exposes.
+Alongside the technical Streamlit dashboard, I also built a separate business-facing summary in Tableau. It covers the historical sales trend, top-selling product categories, and the measured effect of promotions on average sales — basically the high-level view a merchandising or operations lead would actually want, instead of the store/family-level forecast detail the Streamlit app shows.
 
 👉 [Open the Tableau Public dashboard](https://public.tableau.com/app/profile/wei.ting.mo/viz/RetailDemandForecastingExecutiveOverview/RetailDemandForecastingExecutiveOverview)
 
-Built directly from the same historical sales summaries (`reports/data/`) produced during the data-preparation stage of this project, before any modelling.
+It's built straight from the same historical sales summaries (`reports/data/`) produced during data prep, before any modelling happened.
 
 ---
 
@@ -203,11 +203,11 @@ The final model was evaluated using four chronological 16-day validation periods
 
 ## 🧪 Experimentation: Promotion A/B Test Design
 
-The historical data includes a promotion flag, and a naive comparison shows a large average-sales difference between promoted and non-promoted records. That comparison is confounded (promotions are chosen, not randomly assigned) and is not treated as evidence of a causal effect in this project.
+The historical data has a promotion flag, and a naive comparison shows a big average-sales gap between promoted and non-promoted records. I'm not treating that as proof promotions "cause" the lift, though — promotions get chosen by someone, they're not randomly assigned, so the comparison is confounded.
 
-Instead, [`experiments/promotion_lift_analysis.py`](experiments/promotion_lift_analysis.py) uses the historical daily-sales series to estimate real baseline variability and day-of-week seasonality, then computes the sample size a genuinely randomized store-level promotion test would need, comparing a naive design against a randomized block design that blocks on day-of-week. Blocking is shown to reduce the residual variance by 21%, which is a concrete, data-grounded reason to prefer it over simple randomization.
+So instead, [`experiments/promotion_lift_analysis.py`](experiments/promotion_lift_analysis.py) uses the historical daily-sales series to estimate real baseline variability and day-of-week seasonality, then works out the sample size an actually-randomized store-level promotion test would need. It compares a naive design against a randomized block design that blocks on day-of-week, and blocking turns out to cut residual variance by 21% — enough of a difference that I'd push for the blocked design if this were a real test.
 
-The full design -- hypothesis, randomization unit, primary/guardrail metrics, power calculation, analysis plan, and the risks (novelty effects, spillover between nearby stores, calendar confounds) -- is written up in [`docs/experiment_design_promotion_test.md`](docs/experiment_design_promotion_test.md).
+The full write-up — hypothesis, randomization unit, primary/guardrail metrics, power calculation, analysis plan, and the risks I'd worry about (novelty effects, spillover between nearby stores, calendar confounds) — is in [`docs/experiment_design_promotion_test.md`](docs/experiment_design_promotion_test.md).
 
 ---
 
@@ -402,8 +402,14 @@ retail-demand-forecasting/
 │   │   └── dashboard-store-story.png
 │   ├── backtesting_strategy.md
 │   ├── data_source.md
+│   ├── error_analysis.md
+│   ├── experiment_design_promotion_test.md
 │   ├── feature_availability.md
+│   ├── model_card.md
+│   ├── monitoring_plan.md
 │   └── replenishment_assumptions.md
+├── experiments/
+│   └── promotion_lift_analysis.py
 ├── scripts/
 ├── src/
 │   └── retail_forecasting/
@@ -411,7 +417,9 @@ retail-demand-forecasting/
 ├── .python-version
 ├── pyproject.toml
 ├── requirements.txt
+├── requirements-api.txt
 ├── requirements-dev.txt
+├── requirements-lock.txt
 └── README.md
 ```
 
@@ -536,6 +544,8 @@ The original competition files are not included in this repository.
 
 ## ⚠️ Limitations
 
+A few things worth being upfront about:
+
 * The deployed dashboard displays a fixed historical forecast window.
 * Final competition test labels are unavailable.
 * Inventory levels and supplier lead times are not included in the original dataset.
@@ -548,6 +558,8 @@ The original competition files are not included in this repository.
 ---
 
 ## 🔭 Future Improvements
+
+If I kept building this out toward something production-ready, this is roughly the order I'd tackle things:
 
 * prediction intervals;
 * probabilistic demand forecasting;
@@ -565,7 +577,7 @@ The original competition files are not included in this repository.
 
 ## 💼 Portfolio Highlights
 
-This project demonstrates experience in:
+Quick summary of what this project actually put into practice, in case you're skimming:
 
 * time-series forecasting;
 * feature engineering;
