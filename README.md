@@ -325,12 +325,13 @@ flowchart TD
 
         R -->|connected deployment| U[Streamlit Community Cloud]
         R -->|connected deployment| V[Render]
-        R -->|source| W[Docker Image]
-        W -->|EB CLI deploy| X[AWS Elastic Beanstalk]
+
+        R -->|Dockerfile + API source| W[EB CLI]
+        W -->|eb deploy| X[AWS Elastic Beanstalk]
 
         U --> N
         V --> O
-        X --> O
+        X -->|builds and runs container| O
     end
 ```
 
