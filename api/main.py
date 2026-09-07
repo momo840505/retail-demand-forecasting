@@ -64,7 +64,8 @@ class ModelInfoResponse(BaseModel):
 
 class MonitoringInfoResponse(BaseModel):
     model_version: str
-    monitored_signals: list[str]
+    implementation_status: str
+    signals_to_monitor: list[str]
     data_quality_checks: list[str]
     model_quality_checks: list[str]
     operational_checks: list[str]
@@ -117,6 +118,7 @@ class ReplenishmentResponse(BaseModel):
     raw_order_quantity: float
     suggested_order_quantity: int
     stockout_risk_band: str
+    pre_arrival_shortage: bool
 
 
 # =============================================================================
@@ -129,7 +131,7 @@ app = FastAPI(
     version="1.0.0",
     description=(
         "Read-only retail demand forecasts and rule-based replenishment "
-        "decision support for the portfolio demo."
+        "decision support for a historical demo."
     ),
 )
 
@@ -418,14 +420,15 @@ def get_model_info() -> ModelInfoResponse:
     tags=["Model"],
 )
 def get_monitoring_info() -> MonitoringInfoResponse:
-    """Return production monitoring signals for the forecasting demo."""
+    """Return the documented monitoring contract and implementation status."""
 
     api_data = get_api_data()
     model_summary = api_data["summary"]
 
     return MonitoringInfoResponse(
         model_version=str(model_summary["model"]),
-        monitored_signals=[
+        implementation_status="contract_only_no_persistent_telemetry",
+        signals_to_monitor=[
             "forecast_row_count",
             "forecast_date_range",
             "store_family_coverage",

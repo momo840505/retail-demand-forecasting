@@ -2134,16 +2134,29 @@ if planner_tab.open:
             risk_name = replenishment_plan.stockout_risk_band
             risk_class = risk_name.lower()
             risk_messages = {
-                "Critical": "Current stock may run out before the next delivery can arrive.",
+                "Critical": (
+                    "On-hand stock may run out before the scheduled inbound "
+                    "delivery. Expedite stock or arrange an earlier receipt."
+                ),
                 "High": "Stock may reach delivery day, but the safety margin is too small.",
                 "Moderate": "No immediate shortage is expected, but stock is below the preferred level.",
                 "Low": "Current and incoming stock should comfortably cover the planned period.",
             }
-            order_title = (
-                f"Order {replenishment_plan.suggested_order_quantity:,} units"
-                if replenishment_plan.reorder_now
-                else "No immediate order required"
-            )
+
+            if replenishment_plan.pre_arrival_shortage:
+                if replenishment_plan.suggested_order_quantity > 0:
+                    order_title = (
+                        "Expedite stock; order "
+                        f"{replenishment_plan.suggested_order_quantity:,} units"
+                    )
+                else:
+                    order_title = "Expedite stock before the scheduled delivery"
+            elif replenishment_plan.reorder_now:
+                order_title = (
+                    f"Order {replenishment_plan.suggested_order_quantity:,} units"
+                )
+            else:
+                order_title = "No immediate order required"
 
             section(
                 "02",

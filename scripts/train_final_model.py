@@ -12,6 +12,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import xgboost
 from xgboost import XGBRegressor
 
 from retail_forecasting.modeling import (
@@ -365,18 +366,6 @@ def main() -> None:
             "The final inner validation grid is incomplete."
         )
 
-    category_reference_data = pd.concat(
-        [
-            training_data[
-                CATEGORICAL_FEATURE_COLUMNS
-            ],
-            test_data[
-                CATEGORICAL_FEATURE_COLUMNS
-            ],
-        ],
-        ignore_index=True,
-    )
-
     (
         tuning_training_features,
         tuning_validation_features,
@@ -391,7 +380,7 @@ def main() -> None:
                 feature_columns
             ]
         ),
-        reference_data=category_reference_data,
+        reference_data=tuning_training_data,
     )
 
     tuning_training_target = create_log_target(
@@ -480,7 +469,7 @@ def main() -> None:
                 feature_columns
             ]
         ),
-        reference_data=category_reference_data,
+        reference_data=final_training_data,
     )
 
     final_training_target = create_log_target(
@@ -664,7 +653,7 @@ def main() -> None:
         column_name: [
             str(category_value)
             for category_value in (
-                category_reference_data[
+                final_training_data[
                     column_name
                 ]
                 .astype("category")
@@ -730,6 +719,13 @@ def main() -> None:
         "feature_columns": (
             feature_columns
         ),
+        "training_environment_recorded": True,
+        "training_environment": {
+            "python": __import__("platform").python_version(),
+            "numpy": np.__version__,
+            "pandas": pd.__version__,
+            "xgboost": xgboost.__version__,
+        },
         "category_levels": (
             category_levels
         ),

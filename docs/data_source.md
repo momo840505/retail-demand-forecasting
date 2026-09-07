@@ -22,7 +22,7 @@ This project uses the data to develop and evaluate:
 
 - retail demand forecasting models;
 - rolling time-series backtesting;
-- promotion and holiday effect analysis;
+- promotion and holiday pattern analysis;
 - replenishment decision-support simulations.
 
 ## Data Integrity

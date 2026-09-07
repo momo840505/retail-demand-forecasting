@@ -34,6 +34,10 @@ supplier lead-time period has occurred. It reduces the quantity that still
 needs to be ordered, but it is not counted as on-hand stock when assessing
 pre-arrival shortage risk or current days of cover.
 
+`pre_arrival_shortage` is therefore true when current on-hand inventory is
+below forecast lead-time demand, even if a later inbound delivery makes the
+overall inventory position look sufficient.
+
 Lead-time demand:
 
 `sum of forecast demand during the lead-time period`

@@ -55,7 +55,10 @@ def test_monitoring_info_endpoint() -> None:
     result = response.json()
 
     assert result["model_version"] == "xgboost_log_target_nested"
-    assert "forecast_row_count" in result["monitored_signals"]
+    assert result["implementation_status"] == (
+        "contract_only_no_persistent_telemetry"
+    )
+    assert "forecast_row_count" in result["signals_to_monitor"]
     assert result["data_quality_checks"]
     assert result["model_quality_checks"]
     assert result["operational_checks"]

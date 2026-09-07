@@ -150,5 +150,8 @@
   "test_performance_available": false,
   "test_performance_note": "The Kaggle test labels are not available locally. Reported model performance comes from nested chronological backtesting only.",
   "model_sha256": "39528e8501c6c2109dedc1a277106407bcada82707961bcad60ec5b5e4decd8b",
-  "submission_sha256": "5d7bcb97a933d0ec0eef986c18668016f8bb247312dd83c7aef926df1fe64907"
+  "submission_sha256": "5d7bcb97a933d0ec0eef986c18668016f8bb247312dd83c7aef926df1fe64907",
+  "training_environment_recorded": false,
+  "training_environment": null,
+  "training_environment_note": "Exact package versions were not stored when this committed artifact was generated. Regenerate the final model with the current training script to record them."
 }

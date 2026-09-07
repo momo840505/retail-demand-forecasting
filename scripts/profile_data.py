@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import json
 from pathlib import Path
@@ -166,7 +166,7 @@ def create_figures(
     family_sales_summary: pd.DataFrame,
     promotion_sales_summary: pd.DataFrame,
 ) -> None:
-    """Create portfolio-ready exploratory figures."""
+    """Create exploratory figures from the profiled data."""
     FIGURE_DIRECTORY.mkdir(parents=True, exist_ok=True)
 
     plt.figure(figsize=(13, 5))

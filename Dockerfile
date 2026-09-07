@@ -19,8 +19,8 @@ COPY api/ ./api/
 COPY src/ ./src/
 COPY dashboard/data/ ./dashboard/data/
 
-# AWS Elastic Beanstalk's single-container Docker platform expects the
-# application to listen on port 8080 by default.
+# The deployed Elastic Beanstalk environment routes traffic to the
+# container port exposed here.
 EXPOSE 8080
 
 CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8080"]

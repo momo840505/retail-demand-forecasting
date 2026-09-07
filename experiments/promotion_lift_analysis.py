@@ -116,6 +116,19 @@ def compute_day_of_week_stats() -> tuple[
     return overall_mean, overall_std, day_stats
 
 
+def calculate_weighted_within_day_variance(
+    day_stats: dict[str, tuple[float, float, int]],
+) -> float:
+    """Return within-day variance weighted by observation count."""
+    total_count = sum(count for _, _, count in day_stats.values())
+    if total_count <= 0:
+        raise ValueError("Day-of-week statistics must contain observations.")
+    return sum(
+        (standard_deviation ** 2) * count
+        for _, standard_deviation, count in day_stats.values()
+    ) / total_count
+
+
 def print_design_inputs() -> None:
     """Print historical variation relevant to experiment planning."""
     overall_mean, overall_std, day_stats = (
@@ -139,9 +152,8 @@ def print_design_inputs() -> None:
             f"std={std_value:>10,.0f}"
         )
 
-    within_day_variance = statistics.mean(
-        standard_deviation ** 2
-        for _, standard_deviation, _ in day_stats.values()
+    within_day_variance = calculate_weighted_within_day_variance(
+        day_stats
     )
 
     variance_reduction = (

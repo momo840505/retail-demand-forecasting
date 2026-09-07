@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from collections.abc import Sequence
 
@@ -58,7 +58,7 @@ def evaluate_forecast(
     actual_values: Sequence[float],
     predicted_values: Sequence[float],
 ) -> dict[str, float]:
-    """Calculate portfolio forecasting metrics."""
+    """Calculate forecasting metrics."""
     actual_array, predicted_array = prepare_forecast_arrays(
         actual_values=actual_values,
         predicted_values=predicted_values,

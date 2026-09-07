@@ -77,6 +77,7 @@ def test_sufficient_inventory_requires_no_order() -> None:
     assert plan.target_inventory_level == 60.0
     assert plan.suggested_order_quantity == 0
     assert plan.stockout_risk_band == "Low"
+    assert plan.pre_arrival_shortage is False
     assert plan.reorder_now is False
     assert plan.days_of_cover == 10.0
 
@@ -115,6 +116,7 @@ def test_negative_inventory_is_rejected() -> None:
             inputs=inputs,
         )
 
+
 def test_inbound_inventory_does_not_hide_pre_arrival_risk() -> None:
     forecast_data = create_constant_forecast(
         daily_demand=10.0
@@ -137,6 +139,7 @@ def test_inbound_inventory_does_not_hide_pre_arrival_risk() -> None:
     assert plan.inventory_position == 115.0
     assert plan.lead_time_demand == 30.0
     assert plan.stockout_risk_band == "Critical"
+    assert plan.pre_arrival_shortage is True
     assert plan.days_of_cover == 1.5
 
 

@@ -165,7 +165,6 @@ def prepare_feature_pair(
     training_data: pd.DataFrame,
     validation_data: pd.DataFrame,
     feature_columns: list[str],
-    reference_data: pd.DataFrame,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Select and align model features."""
     training_features = training_data[
@@ -179,7 +178,7 @@ def prepare_feature_pair(
     return align_categorical_features(
         training_features=training_features,
         validation_features=validation_features,
-        reference_data=reference_data,
+        reference_data=training_data,
     )
 
 
@@ -269,7 +268,6 @@ def run_fold(
         training_data=inner_training_data,
         validation_data=inner_validation_data,
         feature_columns=feature_columns,
-        reference_data=modeling_data,
     )
 
     inner_training_target = create_log_target(
@@ -395,7 +393,6 @@ def run_fold(
         training_data=outer_training_data,
         validation_data=outer_validation_data,
         feature_columns=feature_columns,
-        reference_data=modeling_data,
     )
 
     outer_training_target = create_log_target(

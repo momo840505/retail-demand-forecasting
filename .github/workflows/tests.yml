@@ -20,10 +20,10 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version-file: ".python-version"
           cache: "pip"
@@ -41,7 +41,7 @@ jobs:
         run: python -m pytest -q
 
       - name: Compile Python files
-        run: python -m compileall -q api dashboard src experiments
+        run: python -m compileall -q api dashboard src experiments scripts
 
       - name: Verify FastAPI application
         run: python -c "from api.main import app; print(app.title)"

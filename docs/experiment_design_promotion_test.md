@@ -72,8 +72,10 @@ fixed before experiment outcomes are examined.
 ## Analysis plan
 
 The main analysis would estimate the treatment effect using store-day data
-with pre-specified calendar controls and store effects. If a pre-period is
-available, baseline adjustment can reduce variance.
+with pre-specified calendar controls and store effects. Standard errors should
+be clustered by store to account for repeated observations from the same
+randomization unit. If a pre-period is available, baseline adjustment can
+reduce variance.
 
 Confidence intervals and guardrail metrics should be reported with the
 primary estimate. Repeated significance checking should not be used unless a

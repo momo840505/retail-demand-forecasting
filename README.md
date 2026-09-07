@@ -46,7 +46,7 @@ So instead of stopping at "here's a model with a decent error rate," I wanted to
 * converts demand forecasts into replenishment recommendations;
 * exposes results through an interactive Streamlit dashboard;
 * serves forecast and replenishment endpoints through FastAPI;
-* gets checked by pytest and GitHub Actions on every push.
+* includes pytest coverage and a GitHub Actions workflow for pushes and pull requests targeting `main`.
 
 > **Important:** The deployed app is a historical demonstration. It shows prepared forecasts for 16 August 2017 to 31 August 2017 and is not connected to a live retailer inventory system.
 
@@ -159,7 +159,7 @@ The replenishment workspace converts forecast demand and inventory assumptions i
 
 ### ⚡ REST API
 
-* service health monitoring
+* service health checks and a documented monitoring contract
 * model information
 * available stores
 * available product families
@@ -278,26 +278,28 @@ flowchart TD
         F --> G
 
         G --> H[Final Model]
-        H --> I[Deployment-Ready Forecast Data]
+        H --> I[Prepared Forecast and Model Data]
     end
 
     subgraph APPLICATION["Application Layer"]
         I --> J[Streamlit Dashboard]
         I --> K[FastAPI Service]
 
-        J -->|uses| L[Shared Replenishment Engine]
-        K -->|uses| L
+        J -->|calls| L[Shared Replenishment Engine]
+        K -->|calls| L
     end
 
-    subgraph QUALITY["Testing and Deployment"]
-        M[GitHub Repository] --> N[GitHub Actions]
-        N --> O[Pytest, Compilation and API Checks]
+    subgraph DELIVERY["Testing and Deployment"]
+        M[GitHub Repository] --> N[GitHub Actions CI]
+        N --> O[Pytest + compileall + API Import Check]
 
-        M --> P[Streamlit Community Cloud]
-        M --> Q[Render]
+        M -->|auto deploy| P[Streamlit Community Cloud]
+        M -->|auto deploy| Q[Render]
+        M -->|Docker + EB CLI| R[AWS Elastic Beanstalk]
 
         P --> J
         Q --> K
+        R --> K
     end
 ```
 
@@ -332,7 +334,7 @@ Raw Order Quantity =
 Target Inventory Level − Inventory Position
 ```
 
-The final suggested quantity also applies non-negative order constraints, minimum order quantity, case-pack rounding, and forecast coverage validation.
+Confirmed inbound inventory reduces the remaining order requirement, but it is not counted as on-hand stock before its scheduled arrival. The final suggested quantity also applies non-negative order constraints, minimum order quantity, case-pack rounding, and forecast coverage validation.
 
 ---
 
@@ -343,6 +345,7 @@ The final suggested quantity also applies non-negative order constraints, minimu
 |GET|`/`|Return API service information|
 |GET|`/health`|Verify API and forecast-data availability|
 |GET|`/model-info`|Return model and validation information|
+|GET|`/monitoring-info`|Return monitoring status and recommended signals|
 |GET|`/stores`|List available stores|
 |GET|`/families`|List available product families|
 |GET|`/forecasts`|Return a store-family forecast|
@@ -504,7 +507,7 @@ python -m pytest -q
 Run syntax validation:
 
 ```bash
-python -m compileall -q api dashboard src
+python -m compileall -q api dashboard src experiments scripts
 ```
 
 Verify the FastAPI application:
@@ -596,7 +599,7 @@ This project covers:
 
 <div align="center">
 
-### Built with Python, XGBoost, Streamlit, FastAPI, Plotly, pytest, GitHub Actions, and Render
+### Built with Python, XGBoost, Streamlit, FastAPI, Plotly, pytest, GitHub Actions, Render, and AWS Elastic Beanstalk
 
 [Live Dashboard](https://retail-demand-forecasting-momo.streamlit.app) ·
 [API Documentation](https://retail-demand-forecasting-api-momo.onrender.com/docs) ·

@@ -37,6 +37,7 @@ class ReplenishmentPlan:
     raw_order_quantity: float
     suggested_order_quantity: int
     stockout_risk_band: str
+    pre_arrival_shortage: bool
 
     def to_dict(self) -> dict[str, object]:
         """Convert the plan into a serialisable dictionary."""
@@ -302,6 +303,10 @@ def calculate_replenishment_plan(
         )
     )
 
+    pre_arrival_shortage = (
+        inputs.current_inventory < lead_time_demand
+    )
+
     stockout_risk_band = (
         determine_stockout_risk_band(
             current_inventory=(
@@ -358,5 +363,8 @@ def calculate_replenishment_plan(
         ),
         stockout_risk_band=(
             stockout_risk_band
+        ),
+        pre_arrival_shortage=(
+            pre_arrival_shortage
         ),
     )

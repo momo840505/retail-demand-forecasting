@@ -4,13 +4,13 @@
 
 This project uses an XGBoost regression model to forecast daily retail demand at the store and product-family level.
 
-The deployed portfolio version produces a historical 16-day forecast window and supports replenishment decision scenarios through a dashboard and API.
+The deployed version serves a fixed historical 16-day forecast window and supports replenishment scenarios through a dashboard and API.
 
 ## Intended Use
 
 The model is intended for:
 
-- portfolio demonstration of leakage-aware forecasting;
+- evaluating leakage-aware retail forecasting methods;
 - store and product-family demand planning;
 - replenishment decision support;
 - comparing machine-learning forecasts against transparent baseline methods.
@@ -19,7 +19,7 @@ It is not intended for live inventory automation without additional production c
 
 ## Data
 
-The project uses the Kaggle Corporacion Favorita Grocery Sales Forecasting dataset.
+The project uses the Kaggle competition **Store Sales - Time Series Forecasting**, based on Corporación Favorita grocery-store data from Ecuador.
 
 Signals include:
 
@@ -71,6 +71,12 @@ The model is compared against:
 - lag-364 forecast;
 - weekly seasonal naive forecast;
 - shifted 28-day mean forecast.
+
+## Reproducibility Note
+
+The committed model reports were generated before the project started recording exact package versions inside the model metadata. The current dependency files define the environment for future reruns, and `scripts/train_final_model.py` now records Python, NumPy, pandas, and XGBoost versions whenever the final model is regenerated.
+
+The existing metrics are internally consistent across the checked-in reports, but the exact package versions used for the original committed model artifact cannot be recovered from the repository history alone.
 
 ## Known Limitations
 
