@@ -35,20 +35,22 @@ These notes provide the context behind the implementation and make the project l
 
 ## 📌 Project Overview
 
-Retail demand moves around with seasonality, promotions, holidays, store-level quirks, and plain customer behaviour — get it wrong and you end up either with empty shelves or a warehouse full of stock nobody's buying. I spent a few years on the sales/order-management side of international trade before switching into data science, so "bad demand planning costs real money" wasn't an abstract idea to me going into this.
+I started this project because I wanted to work on a forecasting problem that could actually connect to a business decision. Before studying data science, I worked with sales and order management, so I had already seen how demand changes can affect stock and planning.
 
-So instead of stopping at "here's a model with a decent error rate," I wanted to build the whole path from raw sales data to an actual ordering decision. The project:
+At first, the main goal was just to forecast daily sales. As I worked on it, I decided to take it a bit further and connect the forecasts to a simple replenishment decision instead of ending the project at the model evaluation stage.
 
-* forecasts daily product-family demand for individual stores;
-* evaluates models using chronological backtesting (never shuffling dates — more on why below);
-* prevents target leakage with horizon-safe feature engineering;
-* compares XGBoost against transparent baseline methods, so the improvement is provable rather than assumed;
-* converts demand forecasts into replenishment recommendations;
-* exposes results through an interactive Streamlit dashboard;
-* serves forecast and replenishment endpoints through FastAPI;
-* includes pytest coverage and a GitHub Actions workflow for pushes and pull requests targeting `main`.
+In this project, I:
 
-> **Important:** The deployed app is a historical demonstration. It shows prepared forecasts for 16 August 2017 to 31 August 2017 and is not connected to a live retailer inventory system.
+* forecast daily demand for each store and product family;
+* use chronological backtesting instead of randomly splitting time-series data;
+* build lag and rolling features carefully so future sales do not leak into the model;
+* compare XGBoost with several simple forecasting baselines;
+* turn the final forecasts into replenishment recommendations based on inventory and lead-time inputs;
+* built a Streamlit dashboard to explore forecasts, model results, and stock scenarios;
+* added a FastAPI service for forecast and replenishment requests;
+* added pytest tests and GitHub Actions to check the project when changes are pushed to `main`.
+
+> **Note:** This is a historical demo using the Kaggle test period from 16 August 2017 to 31 August 2017. It is not connected to a real retailer's live inventory system.
 
 ---
 
@@ -281,39 +283,39 @@ flowchart TD
 
     subgraph DATA["Data Preparation"]
         A[Raw Kaggle Retail Data] --> B[Raw Data Validation]
-        A --> C[Sales Profiling and Summaries]
+        A --> C[Data Profiling<br/>and Sales Summaries]
         B --> D[Modeling Dataset]
-        D --> E[Horizon-Safe Features]
+        D --> E[Horizon-Safe<br/>Features]
     end
 
     subgraph MODEL["Forecasting and Evaluation"]
         E --> F[Baseline Backtesting]
-        E --> G[XGBoost Nested Backtesting]
+        E --> G[XGBoost Nested<br/>Backtesting]
 
         F --> H[Model Comparison]
         G --> H
 
-        H --> I[Final XGBoost Training]
-        I --> J[Final 16-Day Forecast]
+        H --> I[Final XGBoost<br/>Training]
+        I --> J[Final 16-Day<br/>Forecast]
 
         G --> K[Backtest Reports]
         H --> K
     end
 
     subgraph PREP["Deployment Data Preparation"]
-        J --> L[Prepare Dashboard and API Data]
+        J --> L[Prepare Dashboard<br/>and API Data]
         K --> L
         D -->|recent actuals| L
         A -->|store metadata| L
 
-        L --> M[Prepared Deployment Data]
+        L --> M[Prepared<br/>Deployment Data]
     end
 
     subgraph APPLICATION["Application and Analytics"]
         M --> N[Streamlit Dashboard]
         M --> O[FastAPI Service]
 
-        N -->|calls| P[Replenishment Engine]
+        N -->|calls| P[Shared Replenishment<br/>Engine]
         O -->|calls| P
 
         C --> Q[Tableau Public Dashboard]
@@ -321,13 +323,13 @@ flowchart TD
 
     subgraph DELIVERY["Testing and Deployment"]
         R[GitHub Repository] --> S[GitHub Actions CI]
-        S --> T[Tests + compileall + API Check]
+        S --> T[Pytest + compileall<br/>+ API Import Check]
 
-        R -->|connected deployment| U[Streamlit Community Cloud]
+        R -->|connected deployment| U[Streamlit Community<br/>Cloud]
         R -->|connected deployment| V[Render]
 
         R -->|Dockerfile + API source| W[EB CLI]
-        W -->|eb deploy| X[AWS Elastic Beanstalk]
+        W -->|eb deploy| X[AWS Elastic<br/>Beanstalk]
 
         U --> N
         V --> O
