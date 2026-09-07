@@ -172,7 +172,7 @@ The replenishment workspace converts forecast demand and inventory assumptions i
 * reusable package under `src/`
 * automated unit and integration tests
 * GitHub Actions continuous integration
-* deployment-ready forecast data
+* prepared deployment data for the dashboard and API
 * Python 3.11 deployment configuration
 * separate Streamlit and API deployments
 
@@ -217,6 +217,8 @@ The proposed randomization unit, metrics, power-analysis requirements, analysis 
 
 The modeling dataset combines historical sales, store numbers, product families, promotions, store metadata, holidays, events, oil-price history, and calendar variables.
 
+The profiling step also produces the historical sales summaries used by the Tableau dashboard.
+
 ### 2. Horizon-Safe Feature Engineering
 
 The forecast horizon is 16 days. Features therefore use only information available before the forecast period begins.
@@ -257,7 +259,18 @@ The XGBoost model is compared against:
 
 ### 5. Final Forecast
 
-After chronological evaluation, the final model produces a 16-day forecast for every store and product-family combination in the deployment dataset.
+After chronological evaluation, the selected XGBoost approach is trained for the final historical forecast window and produces a 16-day forecast for every store and product-family combination in the deployment dataset.
+
+### 6. Deployment Data Preparation
+
+The deployment preparation step combines:
+
+* the final 16-day forecast;
+* model-comparison and backtesting reports;
+* recent actual sales from the modeling dataset;
+* store metadata.
+
+These inputs are written to `dashboard/data/`, which is the prepared data layer consumed by both the Streamlit dashboard and the FastAPI service.
 
 ---
 
@@ -266,40 +279,58 @@ After chronological evaluation, the final model produces a 16-day forecast for e
 ```mermaid
 flowchart TD
 
-    subgraph PIPELINE["Forecasting Pipeline"]
-        A[Raw Retail Data] --> B[Data Validation]
-        B --> C[Modeling Dataset]
-        C --> D[Horizon-Safe Features]
-
-        D --> E[Baseline Backtesting]
-        D --> F[XGBoost Backtesting]
-
-        E --> G[Model Comparison]
-        F --> G
-
-        G --> H[Final Model]
-        H --> I[Prepared Forecast and Model Data]
+    subgraph DATA["Data Preparation"]
+        A[Raw Kaggle Retail Data] --> B[Raw Data Validation]
+        A --> C[Data Profiling and Sales Summaries]
+        B --> D[Modeling Dataset]
+        D --> E[Horizon-Safe Features]
     end
 
-    subgraph APPLICATION["Application Layer"]
-        I --> J[Streamlit Dashboard]
-        I --> K[FastAPI Service]
+    subgraph MODEL["Forecasting and Evaluation"]
+        E --> F[Baseline Backtesting]
+        E --> G[XGBoost Nested Backtesting]
 
-        J -->|calls| L[Shared Replenishment Engine]
-        K -->|calls| L
+        F --> H[Model Comparison]
+        G --> H
+
+        H --> I[Final XGBoost Training]
+        I --> J[Final 16-Day Forecast]
+
+        G --> K[Backtest Reports]
+        H --> K
+    end
+
+    subgraph PREP["Deployment Data Preparation"]
+        J --> L[Prepare Dashboard and API Data]
+        K --> L
+        D -->|recent actuals| L
+        A -->|store metadata| L
+
+        L --> M[Prepared Deployment Data]
+    end
+
+    subgraph APPLICATION["Application and Analytics"]
+        M --> N[Streamlit Dashboard]
+        M --> O[FastAPI Service]
+
+        N -->|calls| P[Shared Replenishment Engine]
+        O -->|calls| P
+
+        C --> Q[Tableau Public Dashboard]
     end
 
     subgraph DELIVERY["Testing and Deployment"]
-        M[GitHub Repository] --> N[GitHub Actions CI]
-        N --> O[Pytest + compileall + API Import Check]
+        R[GitHub Repository] --> S[GitHub Actions CI]
+        S --> T[Pytest + compileall + API Import Check]
 
-        M -->|auto deploy| P[Streamlit Community Cloud]
-        M -->|auto deploy| Q[Render]
-        M -->|Docker + EB CLI| R[AWS Elastic Beanstalk]
+        R -->|connected deployment| U[Streamlit Community Cloud]
+        R -->|connected deployment| V[Render]
+        R -->|source| W[Docker Image]
+        W -->|EB CLI deploy| X[AWS Elastic Beanstalk]
 
-        P --> J
-        Q --> K
-        R --> K
+        U --> N
+        V --> O
+        X --> O
     end
 ```
 
@@ -386,6 +417,8 @@ https://retail-demand-forecasting-api-momo.onrender.com/docs
 ```text
 retail-demand-forecasting/
 │
+├── .devcontainer/
+│   └── devcontainer.json
 ├── .github/
 │   └── workflows/
 │       └── tests.yml
@@ -398,6 +431,9 @@ retail-demand-forecasting/
 │   ├── app.py
 │   ├── requirements.txt
 │   └── data/
+├── data/
+│   ├── processed/
+│   └── raw/
 ├── docs/
 │   ├── images/
 │   │   ├── dashboard-network-pulse.png
@@ -413,10 +449,15 @@ retail-demand-forecasting/
 │   └── replenishment_assumptions.md
 ├── experiments/
 │   └── promotion_lift_analysis.py
+├── reports/
+│   ├── data/
+│   ├── figures/
+│   └── modeling/
 ├── scripts/
 ├── src/
 │   └── retail_forecasting/
 ├── tests/
+├── Dockerfile
 ├── .python-version
 ├── pyproject.toml
 ├── requirements.txt
@@ -606,4 +647,3 @@ This project covers:
 [GitHub Repository](https://github.com/momo840505/retail-demand-forecasting)
 
 </div>
-
