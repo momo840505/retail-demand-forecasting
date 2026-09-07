@@ -284,7 +284,8 @@ flowchart TD
     subgraph DATA["Data Preparation"]
         A[Raw Kaggle Retail Data] --> B[Raw Data Validation]
         A --> C[Data Profiling<br/>and Sales Summaries]
-        B --> D[Modeling Dataset]
+        A --> D[Modeling Dataset]
+        B -. quality gate .-> D
         D --> E[Horizon-Safe<br/>Features]
     end
 
@@ -295,7 +296,7 @@ flowchart TD
         F --> H[Model Comparison]
         G --> H
 
-        H --> I[Final XGBoost<br/>Training]
+        G -->|evaluated setup| I[Final XGBoost<br/>Training]
         I --> J[Final 16-Day<br/>Forecast]
 
         G --> K[Backtest Reports]
