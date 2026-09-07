@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import math
 from dataclasses import asdict, dataclass
@@ -170,6 +170,7 @@ def round_order_quantity(
 
 
 def determine_stockout_risk_band(
+    current_inventory: float,
     inventory_position: float,
     lead_time_demand: float,
     reorder_point: float,
@@ -178,9 +179,11 @@ def determine_stockout_risk_band(
     """
     Assign a deterministic risk band.
 
-    This is a rule-based classification, not a probability estimate.
+    Confirmed inbound stock is assumed to arrive after lead-time demand
+    has occurred. Pre-arrival shortage risk therefore uses on-hand
+    inventory rather than total inventory position.
     """
-    if inventory_position < lead_time_demand:
+    if current_inventory < lead_time_demand:
         return "Critical"
 
     if inventory_position <= reorder_point:
@@ -266,7 +269,7 @@ def calculate_replenishment_plan(
 
     if average_daily_demand > 0:
         days_of_cover: float | None = (
-            inventory_position
+            inputs.current_inventory
             / average_daily_demand
         )
     else:
@@ -301,6 +304,9 @@ def calculate_replenishment_plan(
 
     stockout_risk_band = (
         determine_stockout_risk_band(
+            current_inventory=(
+                inputs.current_inventory
+            ),
             inventory_position=(
                 inventory_position
             ),

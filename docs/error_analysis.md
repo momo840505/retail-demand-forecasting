@@ -1,75 +1,57 @@
 # Error Analysis
 
-This document outlines how forecast errors should be reviewed before using the model for operational decisions.
+## Current backtest result
 
-## Current Evaluation Summary
+The XGBoost model was evaluated on four untouched 16-day periods.
 
-The final XGBoost model was evaluated across four chronological validation folds.
+| Fold | WAPE | RMSLE |
+|---|---:|---:|
+| 1 | 12.54% | 0.3851 |
+| 2 | 10.68% | 0.3749 |
+| 3 | 12.32% | 0.3907 |
+| 4 | 15.67% | 0.3999 |
 
-| Metric | Result |
-|---|---:|
-| Pooled WAPE | 12.78% |
-| Pooled RMSLE | 0.3877 |
-| WAPE improvement over best baseline | 24.50% |
-| RMSLE improvement over best baseline | 22.56% |
+Pooled WAPE is 12.78% and pooled RMSLE is 0.3877.
 
-## Error Slices To Review
+The fourth fold is the weakest period on WAPE. That variation matters
+because a pooled metric can hide periods where replenishment decisions would
+be less reliable.
 
-Recommended slices:
+## What the committed results support
 
-- store;
-- product family;
-- promotion vs non-promotion days;
-- holiday vs non-holiday days;
-- high-volume vs low-volume families;
-- weekday vs weekend;
-- short-term lags vs annual seasonal periods.
+The model beats the strongest simple baseline on pooled WAPE and RMSLE, but
+the error is not constant over time.
 
-## Common Error Patterns
+The repository does not commit row-level XGBoost outer-fold predictions, so
+it cannot currently reproduce store- or family-level error slices from the
+checked-in artifacts alone. This document does not claim those diagnostics
+have already been run.
 
-Potential forecasting issues include:
+## Diagnostics to add on the next backtest
 
-- stockout-like historical sales suppression;
-- promotion effects that differ by store;
-- holiday effects with local variation;
-- sparse sales for low-volume product families;
-- abrupt demand shifts not visible in historical lags;
-- cold-start limitations for new stores or families.
+The next backtest should persist row-level outer-fold predictions and report:
 
-## Operational Impact
+- error by store;
+- error by product family;
+- promotion versus non-promotion days;
+- holiday versus regular days;
+- volume decile;
+- forecast bias;
+- zero-demand frequency;
+- worst store-family combinations.
 
-Forecast error matters because replenishment recommendations are derived from expected demand.
+Forecast bias should be reported alongside WAPE:
 
-Under-forecasting can cause:
+`sum(prediction - actual) / sum(actual)`
 
-- stockouts;
-- lost sales;
-- poor customer experience.
+Systematic under-forecasting and over-forecasting have different inventory
+costs even when their absolute errors are similar.
 
-Over-forecasting can cause:
+## Operational implication
 
-- excess inventory;
-- spoilage for perishable products;
-- working-capital inefficiency;
-- warehouse and shelf-space pressure.
+Under-forecasting can create stockouts and lost sales. Over-forecasting can
+increase holding cost, spoilage, and working capital.
 
-## Suggested Next Metrics
-
-Add:
-
-- forecast bias by store-family;
-- weighted error by revenue or unit volume;
-- prediction interval coverage;
-- stockout-risk calibration;
-- service-level impact simulation;
-- inventory cost simulation.
-
-## Recommended Dashboard Upgrade
-
-Add an error-analysis tab showing:
-
-- worst store-family combinations by WAPE;
-- fold-by-fold error trend;
-- baseline vs XGBoost comparison by product family;
-- promotion-day error comparison;
-- forecast bias distribution.
+The replenishment layer currently consumes point forecasts. A production
+version should add prediction intervals or quantile forecasts before using
+the model to set service-level inventory targets.

@@ -1,6 +1,6 @@
 {
   "model_name": "xgboost_final_16_day_forecast",
-  "model_file": "artifacts\\models\\xgboost_final_model.json",
+  "model_file": "artifacts/models/xgboost_final_model.json",
   "forecast_horizon_days": 16,
   "training_window_days": 730,
   "final_training_start": "2015-08-17",

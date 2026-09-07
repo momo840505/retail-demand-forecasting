@@ -1,4 +1,4 @@
-﻿# Replenishment Decision-Support Assumptions
+# Replenishment Decision-Support Assumptions
 
 ## Purpose
 
@@ -27,7 +27,12 @@ in the original Kaggle dataset.
 
 Inventory position:
 
-`current inventory + inbound inventory`
+`current inventory + confirmed inbound inventory`
+
+Confirmed inbound inventory is assumed to arrive after demand during the
+supplier lead-time period has occurred. It reduces the quantity that still
+needs to be ordered, but it is not counted as on-hand stock when assessing
+pre-arrival shortage risk or current days of cover.
 
 Lead-time demand:
 
@@ -54,7 +59,7 @@ quantity and case-pack size.
 
 ## Risk Bands
 
-- Critical: inventory is insufficient to cover expected lead-time demand.
+- Critical: on-hand inventory is insufficient to cover expected demand before the confirmed inbound delivery arrives.
 - High: inventory is at or below the reorder point.
 - Moderate: inventory exceeds the reorder point but is below the target.
 - Low: inventory is at or above the target.

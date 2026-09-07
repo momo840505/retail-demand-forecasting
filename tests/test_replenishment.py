@@ -1,4 +1,4 @@
-﻿import pandas as pd
+import pandas as pd
 import pytest
 
 from retail_forecasting.replenishment import (
@@ -114,3 +114,54 @@ def test_negative_inventory_is_rejected() -> None:
             forecast_data=forecast_data,
             inputs=inputs,
         )
+
+def test_inbound_inventory_does_not_hide_pre_arrival_risk() -> None:
+    forecast_data = create_constant_forecast(
+        daily_demand=10.0
+    )
+
+    inputs = ReplenishmentInputs(
+        current_inventory=15.0,
+        inbound_inventory=100.0,
+        lead_time_days=3,
+        safety_stock_days=2,
+        review_period_days=4,
+        case_pack_size=1,
+    )
+
+    plan = calculate_replenishment_plan(
+        forecast_data=forecast_data,
+        inputs=inputs,
+    )
+
+    assert plan.inventory_position == 115.0
+    assert plan.lead_time_demand == 30.0
+    assert plan.stockout_risk_band == "Critical"
+    assert plan.days_of_cover == 1.5
+
+
+def test_inbound_inventory_still_reduces_order_requirement() -> None:
+    forecast_data = create_constant_forecast(
+        daily_demand=10.0
+    )
+
+    inputs = ReplenishmentInputs(
+        current_inventory=20.0,
+        inbound_inventory=20.0,
+        lead_time_days=3,
+        safety_stock_days=2,
+        review_period_days=4,
+        case_pack_size=1,
+    )
+
+    plan = calculate_replenishment_plan(
+        forecast_data=forecast_data,
+        inputs=inputs,
+    )
+
+    assert plan.inventory_position == 40.0
+    assert plan.reorder_point == 50.0
+    assert plan.target_inventory_level == 90.0
+    assert plan.reorder_now is True
+    assert plan.raw_order_quantity == 50.0
+    assert plan.suggested_order_quantity == 50

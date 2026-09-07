@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import gc
 import hashlib
@@ -685,10 +685,10 @@ def main() -> None:
         "model_name": (
             "xgboost_final_16_day_forecast"
         ),
-        "model_file": str(
-            model_path.relative_to(
-                PROJECT_ROOT
-            )
+        "model_file": (
+            model_path
+            .relative_to(PROJECT_ROOT)
+            .as_posix()
         ),
         "forecast_horizon_days": 16,
         "training_window_days": (

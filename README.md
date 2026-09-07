@@ -20,16 +20,16 @@
 
 ---
 
-## Portfolio Engineering Notes
+## Engineering Notes
 
-I wrote up a few extra docs alongside the code, mostly so I have something solid to point to when an interviewer asks "okay, how would this actually behave in production":
+The supporting documentation records the main modeling decisions, evaluation approach, operational assumptions, and known limitations:
 
 - [Model card](docs/model_card.md)
 - [Error analysis](docs/error_analysis.md)
 - [Monitoring plan](docs/monitoring_plan.md)
-- [Experiment design: promotion A/B test](docs/experiment_design_promotion_test.md)
+- [Promotion experiment design](docs/experiment_design_promotion_test.md)
 
-They cover what the model is (and isn't) meant for, how it was evaluated, where it falls short, and what I'd add before trusting it with real inventory decisions.
+These notes provide the context behind the implementation and make the project limitations explicit.
 
 ---
 
@@ -48,7 +48,7 @@ So instead of stopping at "here's a model with a decent error rate," I wanted to
 * serves forecast and replenishment endpoints through FastAPI;
 * gets checked by pytest and GitHub Actions on every push.
 
-> **Important:** The deployed app is a historical portfolio demo — it shows prepared forecasts for 16 August 2017 to 31 August 2017 and isn't wired up to a live retailer's inventory system.
+> **Important:** The deployed app is a historical demonstration. It shows prepared forecasts for 16 August 2017 to 31 August 2017 and is not connected to a live retailer inventory system.
 
 ---
 
@@ -83,7 +83,7 @@ Deployment files: [`Dockerfile`](Dockerfile) — the image only pulls in the API
 
 ### Executive Summary Dashboard (Tableau Public)
 
-Alongside the technical Streamlit dashboard, I also built a separate business-facing summary in Tableau. It covers the historical sales trend, top-selling product categories, and the measured effect of promotions on average sales — basically the high-level view a merchandising or operations lead would actually want, instead of the store/family-level forecast detail the Streamlit app shows.
+The Tableau dashboard provides a separate business-facing summary of historical sales trends, top-selling product categories, and promotion activity. It is intended for a merchandising or operations view, while the Streamlit app focuses on store-family forecasts and replenishment decisions.
 
 👉 [Open the Tableau Public dashboard](https://public.tableau.com/app/profile/wei.ting.mo/viz/RetailDemandForecastingExecutiveOverview/RetailDemandForecastingExecutiveOverview)
 
@@ -203,11 +203,11 @@ The final model was evaluated using four chronological 16-day validation periods
 
 ## 🧪 Experimentation: Promotion A/B Test Design
 
-The historical data has a promotion flag, and a naive comparison shows a big average-sales gap between promoted and non-promoted records. I'm not treating that as proof promotions "cause" the lift, though — promotions get chosen by someone, they're not randomly assigned, so the comparison is confounded.
+The historical promotion flag is observational, so the raw promoted versus non-promoted difference is treated as descriptive rather than causal.
 
-So instead, [`experiments/promotion_lift_analysis.py`](experiments/promotion_lift_analysis.py) uses the historical daily-sales series to estimate real baseline variability and day-of-week seasonality, then works out the sample size an actually-randomized store-level promotion test would need. It compares a naive design against a randomized block design that blocks on day-of-week, and blocking turns out to cut residual variance by 21% — enough of a difference that I'd push for the blocked design if this were a real test.
+[`experiments/promotion_lift_analysis.py`](experiments/promotion_lift_analysis.py) reports the descriptive comparison and quantifies day-of-week variation in the network sales series. It does not claim a required sample size for a store-randomized test because the committed network-level summary is not the correct sampling unit for that calculation.
 
-The full write-up — hypothesis, randomization unit, primary/guardrail metrics, power calculation, analysis plan, and the risks I'd worry about (novelty effects, spillover between nearby stores, calendar confounds) — is in [`docs/experiment_design_promotion_test.md`](docs/experiment_design_promotion_test.md).
+The proposed randomization unit, metrics, power-analysis requirements, analysis plan, and main experiment risks are documented in [`docs/experiment_design_promotion_test.md`](docs/experiment_design_promotion_test.md).
 
 ---
 
@@ -419,7 +419,6 @@ retail-demand-forecasting/
 ├── requirements.txt
 ├── requirements-api.txt
 ├── requirements-dev.txt
-├── requirements-lock.txt
 └── README.md
 ```
 
@@ -536,7 +535,7 @@ python scripts/prepare_dashboard_data.py
 
 This project uses data from the Kaggle competition:
 
-[Corporación Favorita Grocery Sales Forecasting](https://www.kaggle.com/competitions/favorita-grocery-sales-forecasting)
+[Store Sales - Time Series Forecasting](https://www.kaggle.com/competitions/store-sales-time-series-forecasting)
 
 The original competition files are not included in this repository.
 
@@ -559,7 +558,7 @@ A few things worth being upfront about:
 
 ## 🔭 Future Improvements
 
-If I kept building this out toward something production-ready, this is roughly the order I'd tackle things:
+The next improvements I would prioritise are:
 
 * prediction intervals;
 * probabilistic demand forecasting;
@@ -575,9 +574,9 @@ If I kept building this out toward something production-ready, this is roughly t
 
 ---
 
-## 💼 Portfolio Highlights
+## 💼 Technical Scope
 
-Quick summary of what this project actually put into practice, in case you're skimming:
+This project covers:
 
 * time-series forecasting;
 * feature engineering;

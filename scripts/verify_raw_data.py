@@ -119,7 +119,11 @@ def validate_raw_data() -> None:
 
     validation_result = {
         "status": "PASS" if not validation_errors else "FAIL",
-        "raw_data_directory": str(RAW_DATA_DIRECTORY),
+        "raw_data_directory": (
+            RAW_DATA_DIRECTORY
+            .relative_to(PROJECT_ROOT)
+            .as_posix()
+        ),
         "expected_file_count": len(EXPECTED_COLUMNS),
         "validated_file_count": len(manifest_records),
         "errors": validation_errors,

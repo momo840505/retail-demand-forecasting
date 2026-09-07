@@ -1,145 +1,167 @@
-"""Promotion lift: what the historical data can and cannot tell us, plus a
-sample-size / power calculation for a proper randomized test.
+"""Promotion diagnostics and inputs for a future randomized experiment.
 
-This script has two parts:
+The historical promotion flag is observational. The raw promoted versus
+non-promoted difference is useful as descriptive context, but it is not a
+causal estimate because promotion assignment was not randomized.
 
-1. Observational comparison (reports/data/promotion_sales_summary.csv)
-   Reports the raw difference in average sales between promoted and
-   non-promoted records -- and explains why this number is NOT evidence
-   that promotions *cause* higher sales. The data was never randomized:
-   promotions are placed on products/days a merchandiser already expected
-   to sell well (higher-traffic categories, weekends, holidays), so the
-   comparison is confounded. This is a classic case where a large,
-   easy-to-compute effect size is misleading without a designed experiment.
-
-2. Experiment design (the actual deliverable)
-   Uses the *historical daily sales series* (reports/data/daily_sales_summary.csv)
-   only to estimate real-world variability -- the baseline mean and standard
-   deviation of daily sales, and the day-of-week seasonality -- as legitimate,
-   data-grounded inputs to a standard sample-size / power calculation for a
-   future randomized promotion test. It also demonstrates, numerically, why
-   blocking the design on day-of-week (a randomized block design) meaningfully
-   increases statistical power compared to a naive, unblocked randomization.
-
-Run with:  python experiments/promotion_lift_analysis.py
-No external dependencies beyond the Python standard library.
+This script reports that descriptive comparison and quantifies day-of-week
+variation in network sales. It intentionally does not report a required
+sample size for a store-randomized experiment because the committed
+network-level series does not contain the store-level repeated-measures
+variance needed for that calculation.
 """
 
 import csv
-import math
 import statistics
 from collections import defaultdict
 from datetime import date
 from pathlib import Path
 
+
 DATA_DIR = Path(__file__).resolve().parent.parent / "reports" / "data"
 
-# Two-sided test, alpha = 0.05, power = 80% -- standard defaults.
-Z_ALPHA = 1.959964
-Z_BETA = 0.841621
-
 DAYS_OF_WEEK = [
-    "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
 ]
 
 
-def load_promotion_summary() -> list[dict]:
-    with open(DATA_DIR / "promotion_sales_summary.csv", newline="", encoding="utf-8") as f:
-        return list(csv.DictReader(f))
+def load_promotion_summary() -> list[dict[str, str]]:
+    """Load the descriptive promotion summary."""
+    with (DATA_DIR / "promotion_sales_summary.csv").open(
+        newline="",
+        encoding="utf-8",
+    ) as input_file:
+        return list(csv.DictReader(input_file))
 
 
-def load_daily_sales() -> list[dict]:
-    with open(DATA_DIR / "daily_sales_summary.csv", newline="", encoding="utf-8") as f:
-        return list(csv.DictReader(f))
+def load_daily_sales() -> list[dict[str, str]]:
+    """Load the network-level daily sales summary."""
+    with (DATA_DIR / "daily_sales_summary.csv").open(
+        newline="",
+        encoding="utf-8",
+    ) as input_file:
+        return list(csv.DictReader(input_file))
 
 
 def print_observational_comparison() -> None:
-    print("=" * 78)
-    print("PART 1 -- Observational promotion comparison (NOT a randomized test)")
-    print("=" * 78)
+    """Print descriptive promoted and non-promoted sales averages."""
     rows = load_promotion_summary()
+    averages: dict[str, float] = {}
+
+    print("=" * 72)
+    print("PROMOTION STATUS - DESCRIPTIVE COMPARISON")
+    print("=" * 72)
+
     for row in rows:
+        label = row["promotion_status"]
+        average_sales = float(row["average_sales"])
+        averages[label] = average_sales
+
         print(
-            f"  {row['promotion_status']:<20s} "
-            f"avg_sales={float(row['average_sales']):>10,.2f}  "
+            f"{label:<20s} "
+            f"average_sales={average_sales:>10,.2f} "
             f"records={int(row['record_count']):>10,d}"
         )
+
+    promoted = averages.get("On promotion")
+    not_promoted = averages.get("Not on promotion")
+
+    if promoted is not None and not_promoted:
+        print(
+            f"Raw average ratio: "
+            f"{promoted / not_promoted:.2f}x"
+        )
+
     print(
-        "\n  Raw ratio (on-promotion avg / not-on-promotion avg) looks like a huge "
-        "lift, but promoted items/days were CHOSEN, not randomly assigned.\n"
-        "  Category, day-of-week, seasonality and store effects are all bundled "
-        "into that number. Treat it as descriptive context only -- it is not\n"
-        "  usable as evidence of a causal promotion effect, and it is not the "
-        "basis for the sample-size calculation below."
+        "\nThis comparison is observational. Promotion assignment was "
+        "not randomized, so category mix, store mix, calendar effects, "
+        "and merchandising decisions can all contribute to the gap."
     )
-    print()
 
 
-def compute_daily_stats() -> tuple[float, float, dict[str, tuple[float, float, int]]]:
+def compute_day_of_week_stats() -> tuple[
+    float,
+    float,
+    dict[str, tuple[float, float, int]],
+]:
+    """Calculate network sales statistics by day of week."""
     rows = load_daily_sales()
-    sales = [float(r["total_sales"]) for r in rows]
+    sales = [float(row["total_sales"]) for row in rows]
+
     overall_mean = statistics.mean(sales)
     overall_std = statistics.pstdev(sales)
 
-    by_dow: dict[str, list[float]] = defaultdict(list)
-    for r in rows:
-        d = date.fromisoformat(r["date"])
-        by_dow[DAYS_OF_WEEK[d.weekday()]].append(float(r["total_sales"]))
+    by_day: dict[str, list[float]] = defaultdict(list)
 
-    dow_stats = {
-        day: (statistics.mean(vals), statistics.pstdev(vals), len(vals))
-        for day, vals in by_dow.items()
+    for row in rows:
+        observed_date = date.fromisoformat(row["date"])
+        day_name = DAYS_OF_WEEK[observed_date.weekday()]
+        by_day[day_name].append(float(row["total_sales"]))
+
+    day_stats = {
+        day_name: (
+            statistics.mean(values),
+            statistics.pstdev(values),
+            len(values),
+        )
+        for day_name, values in by_day.items()
     }
-    return overall_mean, overall_std, dow_stats
+
+    return overall_mean, overall_std, day_stats
 
 
-def sample_size_per_group(sigma: float, delta: float) -> int:
-    """Two-sample z-test sample size per group, two-sided alpha=0.05, power=80%."""
-    n = 2 * ((Z_ALPHA + Z_BETA) ** 2) * (sigma ** 2) / (delta ** 2)
-    return math.ceil(n)
-
-
-def print_experiment_design() -> None:
-    print("=" * 78)
-    print("PART 2 -- Sample size for a real randomized promotion test")
-    print("=" * 78)
-    overall_mean, overall_std, dow_stats = compute_daily_stats()
-
-    print(f"  Baseline daily sales -- mean: {overall_mean:,.0f}, std: {overall_std:,.0f}")
-    print(f"  Coefficient of variation: {overall_std / overall_mean:.3f}\n")
-
-    print("  Day-of-week breakdown (evidence of seasonality to block on):")
-    for day in DAYS_OF_WEEK:
-        m, s, n = dow_stats[day]
-        print(f"    {day:<10s} n={n:>4d}  mean={m:>11,.0f}  std={s:>10,.0f}")
-
-    within_dow_var = statistics.mean([s ** 2 for _, s, _ in dow_stats.values()])
-    overall_var = overall_std ** 2
-    variance_reduction = 1 - within_dow_var / overall_var
-    blocked_std = math.sqrt(within_dow_var)
-
-    print(
-        f"\n  Blocking on day-of-week reduces variance by {variance_reduction:.1%} "
-        f"({overall_std:,.0f} -> {blocked_std:,.0f} std),\n"
-        "  because a large share of daily variability is explained by which "
-        "day of the week it is (weekends run 30-40% above weekdays)."
+def print_design_inputs() -> None:
+    """Print historical variation relevant to experiment planning."""
+    overall_mean, overall_std, day_stats = (
+        compute_day_of_week_stats()
     )
 
-    print("\n  Sample size per arm (days), two-sided alpha=0.05, power=80%:\n")
-    header = f"  {'Design':<32s} {'MDE':>6s} {'sigma':>10s} {'n/arm (days)':>14s}"
-    print(header)
-    print("  " + "-" * (len(header) - 2))
-    for label, sigma in [
-        ("Unblocked (simple randomization)", overall_std),
-        ("Blocked by day-of-week", blocked_std),
-    ]:
-        for mde_pct in (0.05, 0.10):
-            delta = overall_mean * mde_pct
-            n = sample_size_per_group(sigma, delta)
-            print(f"  {label:<32s} {mde_pct:>5.0%} {sigma:>10,.0f} {n:>14,d}")
-    print()
+    print("\n" + "=" * 72)
+    print("EXPERIMENT DESIGN INPUTS")
+    print("=" * 72)
+    print(
+        f"Network daily sales mean={overall_mean:,.0f}, "
+        f"std={overall_std:,.0f}"
+    )
+
+    for day_name in DAYS_OF_WEEK:
+        mean_value, std_value, count = day_stats[day_name]
+        print(
+            f"{day_name:<10s} "
+            f"n={count:>4d} "
+            f"mean={mean_value:>11,.0f} "
+            f"std={std_value:>10,.0f}"
+        )
+
+    within_day_variance = statistics.mean(
+        standard_deviation ** 2
+        for _, standard_deviation, _ in day_stats.values()
+    )
+
+    variance_reduction = (
+        1.0
+        - within_day_variance / (overall_std ** 2)
+    )
+
+    print(
+        "\nRemoving the day-of-week mean explains "
+        f"{variance_reduction:.1%} of network-level variance."
+    )
+
+    print(
+        "\nA store-randomized promotion test needs a power calculation "
+        "based on store-category repeated measures. The network-wide "
+        "daily series used here is not the correct sampling unit for "
+        "that calculation."
+    )
 
 
 if __name__ == "__main__":
     print_observational_comparison()
-    print_experiment_design()
+    print_design_inputs()

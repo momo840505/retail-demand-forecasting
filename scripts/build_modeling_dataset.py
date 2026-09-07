@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import json
 from pathlib import Path
@@ -14,6 +14,7 @@ from retail_forecasting.features import (
     build_daily_oil_features,
     build_store_holiday_features,
 )
+from retail_forecasting.modeling import get_model_feature_columns
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -297,16 +298,9 @@ def build_modeling_datasets(
             "date-store-family grid."
         )
 
-    excluded_columns = {
-        "id",
-        "sales",
-    }
-
-    model_feature_columns = [
-        column_name
-        for column_name in modeling_train_data.columns
-        if column_name not in excluded_columns
-    ]
+    model_feature_columns = get_model_feature_columns(
+        modeling_train_data
+    )
 
     categorical_columns = [
         column_name
