@@ -281,7 +281,7 @@ flowchart TD
 
     subgraph DATA["Data Preparation"]
         A[Raw Kaggle Retail Data] --> B[Raw Data Validation]
-        A --> C[Data Profiling and Sales Summaries]
+        A --> C[Sales Profiling and Summaries]
         B --> D[Modeling Dataset]
         D --> E[Horizon-Safe Features]
     end
@@ -313,7 +313,7 @@ flowchart TD
         M --> N[Streamlit Dashboard]
         M --> O[FastAPI Service]
 
-        N -->|calls| P[Shared Replenishment Engine]
+        N -->|calls| P[Replenishment Engine]
         O -->|calls| P
 
         C --> Q[Tableau Public Dashboard]
@@ -321,7 +321,7 @@ flowchart TD
 
     subgraph DELIVERY["Testing and Deployment"]
         R[GitHub Repository] --> S[GitHub Actions CI]
-        S --> T[Pytest + compileall + API Import Check]
+        S --> T[Tests + compileall + API Check]
 
         R -->|connected deployment| U[Streamlit Community Cloud]
         R -->|connected deployment| V[Render]
