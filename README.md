@@ -1,573 +1,215 @@
 <div align="center">
 
-# 🛍️ Retail Demand Forecasting
+# Retail Demand Forecasting
 
-### Leakage-aware demand forecasting and replenishment decision support for multi-store retail planning
+Daily store-family forecasts with a simple replenishment decision layer.
 
-[![Live Dashboard](https://img.shields.io/badge/Live%20Dashboard-Open%20App-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://retail-demand-forecasting-momo.streamlit.app)
-[![API Documentation](https://img.shields.io/badge/FastAPI-API%20Docs-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://retail-demand-forecasting-api-momo.onrender.com/docs)
-[![AWS Elastic Beanstalk](https://img.shields.io/badge/AWS-Live%20on%20Elastic%20Beanstalk-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)](http://retail-forecast-env.eba-vwkt2222.ap-southeast-2.elasticbeanstalk.com/docs)
-[![Tableau Public](https://img.shields.io/badge/Tableau-Executive%20Dashboard-E97627?style=for-the-badge&logo=tableau&logoColor=white)](https://public.tableau.com/app/profile/wei.ting.mo/viz/RetailDemandForecastingExecutiveOverview/RetailDemandForecastingExecutiveOverview)
-
-[![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
-[![XGBoost](https://img.shields.io/badge/XGBoost-Forecasting-EB5B25?style=flat-square)](https://xgboost.readthedocs.io/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-FF4B4B?style=flat-square&logo=streamlit&logoColor=white)](https://streamlit.io/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-REST%20API-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![Pytest](https://img.shields.io/badge/Pytest-Tested-0A9EDC?style=flat-square&logo=pytest&logoColor=white)](https://docs.pytest.org/)
 [![Python Tests](https://github.com/momo840505/retail-demand-forecasting/actions/workflows/tests.yml/badge.svg)](https://github.com/momo840505/retail-demand-forecasting/actions/workflows/tests.yml)
+[![Live Dashboard](https://img.shields.io/badge/Streamlit-Live%20Dashboard-FF4B4B?logo=streamlit&logoColor=white)](https://retail-demand-forecasting-momo.streamlit.app)
+[![API Documentation](https://img.shields.io/badge/FastAPI-API%20Docs-009688?logo=fastapi&logoColor=white)](https://retail-demand-forecasting-api-momo.onrender.com/docs)
+[![Tableau Public](https://img.shields.io/badge/Tableau-Public%20Dashboard-E97627?logo=tableau&logoColor=white)](https://public.tableau.com/app/profile/wei.ting.mo/viz/RetailDemandForecastingExecutiveOverview/RetailDemandForecastingExecutiveOverview)
 
 </div>
 
----
+## Why I built it
 
-## Engineering Notes
+I wanted to do a forecasting project that did not stop at "the model predicts sales."
 
-The supporting documentation records the main modeling decisions, evaluation approach, operational assumptions, and known limitations:
+Before studying data science I worked around sales and order planning, so I was interested in the next question too: if a forecast says demand is coming, what would someone actually do with that information?
 
-- [Model card](docs/model_card.md)
-- [Error analysis](docs/error_analysis.md)
-- [Monitoring plan](docs/monitoring_plan.md)
-- [Promotion experiment design](docs/experiment_design_promotion_test.md)
+The project therefore has two parts:
 
-These notes provide the context behind the implementation and make the project limitations explicit.
+1. forecast daily demand for each store and product family;
+2. use the forecast with inventory assumptions to calculate a simple replenishment suggestion.
 
----
+This is a historical portfolio demo based on the Kaggle Store Sales competition. It is not connected to a retailer's live inventory system.
 
-## 📌 Project Overview
+## Results
 
-I started this project because I wanted to work on a forecasting problem that could actually connect to a business decision. Before studying data science, I worked with sales and order management, so I had already seen how demand changes can affect stock and planning.
-
-At first, the main goal was just to forecast daily sales. As I worked on it, I decided to take it a bit further and connect the forecasts to a simple replenishment decision instead of ending the project at the model evaluation stage.
-
-In this project, I:
-
-* forecast daily demand for each store and product family;
-* use chronological backtesting instead of randomly splitting time-series data;
-* build lag and rolling features carefully so future sales do not leak into the model;
-* compare XGBoost with several simple forecasting baselines;
-* turn the final forecasts into replenishment recommendations based on inventory and lead-time inputs;
-* built a Streamlit dashboard to explore forecasts, model results, and stock scenarios;
-* added a FastAPI service for forecast and replenishment requests;
-* added pytest tests and GitHub Actions to check the project when changes are pushed to `main`.
-
-> **Note:** This is a historical demo using the Kaggle test period from 16 August 2017 to 31 August 2017. It is not connected to a real retailer's live inventory system.
-
----
-
-## 🚀 Live Applications
-
-### Interactive Dashboard
-
-Explore network demand, store-level forecasts, promotion activity, model performance, and inventory decisions.
-
-👉 [Open the Streamlit Dashboard](https://retail-demand-forecasting-momo.streamlit.app)
-
-### Forecasting API
-
-Access model metadata, store references, product families, store-family forecasts, and replenishment recommendations.
-
-👉 [Open the FastAPI Documentation](https://retail-demand-forecasting-api-momo.onrender.com/docs)
-
-### API Health Check
-
-👉 [Check API Status](https://retail-demand-forecasting-api-momo.onrender.com/health)
-
-> The API is hosted on a free Render instance. The first request after inactivity may take longer while the service starts.
-
-### Forecasting API — AWS Deployment
-
-I also containerised the same read-only forecasting/replenishment API and deployed it separately to **AWS Elastic Beanstalk** (Docker platform, single-instance `t3.micro`, `ap-southeast-2`), alongside the Render deployment above. I wanted an AWS deployment I'd actually run myself, not just an infrastructure-as-code file sitting in the repo that never got applied.
-
-👉 [Open the AWS-hosted API docs](http://retail-forecast-env.eba-vwkt2222.ap-southeast-2.elasticbeanstalk.com/docs)
-👉 [Check AWS API health](http://retail-forecast-env.eba-vwkt2222.ap-southeast-2.elasticbeanstalk.com/health)
-
-Deployment files: [`Dockerfile`](Dockerfile) — the image only pulls in the API's runtime dependencies (listed separately in [`requirements-api.txt`](requirements-api.txt)) instead of the full training/dashboard toolchain, so it builds faster — and the standard Elastic Beanstalk CLI flow (`eb init`, `eb create --single --instance-type t3.micro`, `eb deploy`).
-
-### Executive Summary Dashboard (Tableau Public)
-
-The Tableau dashboard provides a separate business-facing summary of historical sales trends, top-selling product categories, and promotion activity. It is intended for a merchandising or operations view, while the Streamlit app focuses on store-family forecasts and replenishment decisions.
-
-👉 [Open the Tableau Public dashboard](https://public.tableau.com/app/profile/wei.ting.mo/viz/RetailDemandForecastingExecutiveOverview/RetailDemandForecastingExecutiveOverview)
-
-It's built straight from the same historical sales summaries (`reports/data/`) produced during data prep, before any modelling happened.
-
----
-
-## 🖼️ Dashboard Preview
-
-### Network Pulse
-
-The network view summarizes expected demand across all stores and product families.
-
-![Network Pulse](docs/images/dashboard-network-pulse.png)
-
-### Store Story
-
-The store-level view shows historical demand and the next 16 days of expected sales for the selected store and product family.
-
-![Store Story](docs/images/dashboard-store-story.png)
-
-### Stock Decision
-
-The replenishment workspace converts forecast demand and inventory assumptions into a practical ordering recommendation.
-
-![Stock Decision](docs/images/dashboard-stock-decision.png)
-
----
-
-## ✨ Key Features
-
-### 📈 Demand Forecasting
-
-* 16-day daily demand forecasts
-* store and product-family level predictions
-* XGBoost regression with a log-transformed target
-* calendar, promotion, holiday, oil-price, lag, and rolling features
-* non-negative forecast outputs
-
-### 🕒 Leakage-Aware Validation
-
-* chronological train-validation splits
-* four consecutive outer validation periods
-* separate inner validation for model selection
-* forecast-horizon-safe lag features
-* shifted rolling statistics
-* outer test periods isolated from tuning decisions
-
-### 📦 Replenishment Decision Support
-
-* current and inbound inventory inputs
-* lead-time demand
-* configurable review period
-* safety-stock buffer
-* reorder point and target inventory level
-* case-pack rounding
-* minimum order quantity
-* stockout risk classification
-
-### 🖥️ Interactive Dashboard
-
-* network-wide demand overview
-* store and product-family selection
-* historical and future demand chart
-* forecast-day slider
-* promotion activity
-* downloadable forecast data
-* replenishment scenario planner
-* model performance summary
-* baseline comparison
-* feature importance
-* chronological fold results
-
-### ⚡ REST API
-
-* service health checks and a documented monitoring contract
-* model information
-* available stores
-* available product families
-* store-family forecasts
-* replenishment recommendations
-* Swagger and ReDoc documentation
-
-### ✅ Engineering Quality
-
-* reusable package under `src/`
-* automated unit and integration tests
-* GitHub Actions continuous integration
-* prepared deployment data for the dashboard and API
-* Python 3.11 deployment configuration
-* separate Streamlit and API deployments
-
----
-
-## 📊 Model Performance
-
-The final model was evaluated using four chronological 16-day validation periods.
+The model was evaluated with four consecutive 16-day chronological backtests.
 
 | Metric | Result |
 |---|---:|
-|Pooled WAPE|**12.78%**|
-|Pooled RMSLE|**0.3877**|
-|WAPE improvement over best baseline|**24.50%**|
-|RMSLE improvement over best baseline|**22.56%**|
-|Backtesting folds|**4**|
-|Forecast horizon|**16 days**|
-|Training history per fold|**730 days**|
-|Inner validation window|**16 days**|
+| Pooled WAPE | **12.78%** |
+| Pooled RMSLE | **0.3877** |
+| WAPE improvement over best baseline | **24.50%** |
+| RMSLE improvement over best baseline | **22.56%** |
+| Backtest folds | **4** |
+| Forecast horizon | **16 days** |
+| Training history per fold | **730 days** |
+| Inner validation window | **16 days** |
 
-### Why Two Metrics?
+I report both WAPE and RMSLE because they answer slightly different questions. WAPE is useful for total demand error, while RMSLE puts more weight on proportional error and reduces the effect of very large sales values.
 
-**WAPE** measures total absolute forecast error relative to total demand and is useful for operational planning.
+## The part I was most careful about: future-data leakage
 
-**RMSLE** evaluates proportional error after log transformation and reduces the influence of very large sales values.
+A direct 16-day forecast should not use sales that would only become known inside those same 16 days.
 
----
+The feature code therefore rejects lags shorter than the forecast horizon. The current sales-history features include:
 
-## 🧪 Experimentation: Promotion A/B Test Design
+- `sales_lag_16`
+- `sales_lag_21`
+- `sales_lag_28`
+- `sales_lag_35`
+- `sales_lag_364`
+- shifted 7-day and 28-day rolling means
+- shifted 28-day rolling standard deviation
 
-The historical promotion flag is observational, so the raw promoted versus non-promoted difference is treated as descriptive rather than causal.
+Oil-price features are shifted by the same forecast horizon before they are used.
 
-[`experiments/promotion_lift_analysis.py`](experiments/promotion_lift_analysis.py) reports the descriptive comparison and quantifies day-of-week variation in the network sales series. It does not claim a required sample size for a store-randomized test because the committed network-level summary is not the correct sampling unit for that calculation.
+The backtest is chronological rather than a random train/test split. Each outer validation period is kept out of the inner model-selection step.
 
-The proposed randomization unit, metrics, power-analysis requirements, analysis plan, and main experiment risks are documented in [`docs/experiment_design_promotion_test.md`](docs/experiment_design_promotion_test.md).
+## Baselines
 
----
+I compare XGBoost against simple forecasting rules instead of only reporting the model by itself:
 
-## 🧠 Forecasting Methodology
+- zero forecast;
+- lag-16;
+- lag-364;
+- weekly seasonal naive;
+- shifted 28-day mean.
 
-### 1. Data Preparation
+That comparison is what the improvement percentages above are based on.
 
-The modeling dataset combines historical sales, store numbers, product families, promotions, store metadata, holidays, events, oil-price history, and calendar variables.
+## Replenishment calculation
 
-The profiling step also produces the historical sales summaries used by the Tableau dashboard.
+The replenishment part is a deterministic calculation, not a learned inventory-optimisation model.
 
-### 2. Horizon-Safe Feature Engineering
+```text
+Inventory position = current inventory + confirmed inbound inventory
+```
 
-The forecast horizon is 16 days. Features therefore use only information available before the forecast period begins.
+```text
+Safety stock = average daily forecast × safety-stock days
+```
 
-Examples include:
+```text
+Reorder point = lead-time demand + safety stock
+```
 
-* `sales_lag_16`
-* `sales_lag_21`
-* `sales_lag_28`
-* `sales_lag_35`
-* `sales_lag_364`
-* shifted rolling mean
-* shifted rolling standard deviation
-* historical oil-price features
-* known calendar and promotion variables
+```text
+Target inventory = protection-period demand + safety stock
+```
 
-Any lag shorter than the forecast horizon is rejected by the feature-engineering logic.
+```text
+Raw order quantity = target inventory - inventory position
+```
 
-### 3. Chronological Backtesting
+Confirmed inbound stock reduces the remaining order requirement, but it does not hide a shortage that can happen before the inbound stock arrives. The final quantity also applies minimum-order and case-pack rules.
 
-The project uses:
+The code rejects a request when the forecast does not cover the full lead-time plus review period.
 
-* four consecutive outer validation periods;
-* a 16-day forecast horizon;
-* a 730-day rolling training window;
-* a separate 16-day inner validation period;
-* outer validation periods used only for final evaluation.
+## Live versions
 
-### 4. Baseline Comparison
+### Streamlit dashboard
 
-The XGBoost model is compared against:
+[Open the dashboard](https://retail-demand-forecasting-momo.streamlit.app)
 
-* zero forecast;
-* lag-16 forecast;
-* lag-364 forecast;
-* weekly seasonal naive forecast;
-* shifted 28-day mean forecast.
+The dashboard includes network demand, store-family forecasts, backtest results, model comparison, feature importance, and a replenishment scenario page.
 
-### 5. Final Forecast
+### FastAPI service
 
-After chronological evaluation, the selected XGBoost approach is trained for the final historical forecast window and produces a 16-day forecast for every store and product-family combination in the deployment dataset.
+[Open the API docs](https://retail-demand-forecasting-api-momo.onrender.com/docs)
 
-### 6. Deployment Data Preparation
+The Render instance can be slow on the first request after inactivity because it is hosted on a free plan.
 
-The deployment preparation step combines:
+### AWS Elastic Beanstalk
 
-* the final 16-day forecast;
-* model-comparison and backtesting reports;
-* recent actual sales from the modeling dataset;
-* store metadata.
+I also deployed the same read-only API as a Docker application on Elastic Beanstalk in `ap-southeast-2`.
 
-These inputs are written to `dashboard/data/`, which is the prepared data layer consumed by both the Streamlit dashboard and the FastAPI service.
+[Open the AWS API docs](http://retail-forecast-env.eba-vwkt2222.ap-southeast-2.elasticbeanstalk.com/docs)
 
----
+The Docker image uses the smaller API-only requirements file instead of installing the full training and dashboard environment.
 
-## 🏗️ System Architecture
+### Tableau Public
+
+[Open the Tableau dashboard](https://public.tableau.com/app/profile/wei.ting.mo/viz/RetailDemandForecastingExecutiveOverview/RetailDemandForecastingExecutiveOverview)
+
+The Tableau view uses historical sales summaries produced during data preparation. It is separate from the forecasting dashboard and is mainly for a business-facing overview of demand and promotion activity.
+
+## Data flow
 
 ```mermaid
 flowchart TD
+    A[Raw Kaggle files] --> B[Data checks]
+    A --> C[Historical sales summaries]
+    A --> D[Modeling dataset]
+    D --> E[Horizon-safe features]
 
-    subgraph DATA["Data Preparation"]
-        A[Raw Kaggle Retail Data] --> B[Raw Data Validation]
-        A --> C[Data Profiling<br/>and Sales Summaries]
-        A --> D[Modeling Dataset]
-        B -. quality gate .-> D
-        D --> E[Horizon-Safe<br/>Features]
-    end
+    E --> F[Baseline backtests]
+    E --> G[XGBoost backtests]
+    F --> H[Model comparison]
+    G --> H
+    G --> I[Final training]
+    I --> J[16-day forecast]
 
-    subgraph MODEL["Forecasting and Evaluation"]
-        E --> F[Baseline Backtesting]
-        E --> G[XGBoost Nested<br/>Backtesting]
+    J --> K[Prepare app data]
+    H --> K
+    D --> K
+    A --> K
 
-        F --> H[Model Comparison]
-        G --> H
+    K --> L[Streamlit]
+    K --> M[FastAPI]
+    L --> N[Replenishment logic]
+    M --> N
 
-        G -->|evaluated setup| I[Final XGBoost<br/>Training]
-        I --> J[Final 16-Day<br/>Forecast]
-
-        G --> K[Backtest Reports]
-        H --> K
-    end
-
-    subgraph PREP["Deployment Data Preparation"]
-        J --> L[Prepare Dashboard<br/>and API Data]
-        K --> L
-        D -->|recent actuals| L
-        A -->|store metadata| L
-
-        L --> M[Prepared<br/>Deployment Data]
-    end
-
-    subgraph APPLICATION["Application and Analytics"]
-        M --> N[Streamlit Dashboard]
-        M --> O[FastAPI Service]
-
-        N -->|calls| P[Shared Replenishment<br/>Engine]
-        O -->|calls| P
-
-        C --> Q[Tableau Public Dashboard]
-    end
-
-    subgraph DELIVERY["Testing and Deployment"]
-        R[GitHub Repository] --> S[GitHub Actions CI]
-        S --> T[Pytest + compileall<br/>+ API Import Check]
-
-        R -->|connected deployment| U[Streamlit Community<br/>Cloud]
-        R -->|connected deployment| V[Render]
-
-        R -->|Dockerfile + API source| W[EB CLI]
-        W -->|eb deploy| X[AWS Elastic<br/>Beanstalk]
-
-        U --> N
-        V --> O
-        X -->|builds and runs container| O
-    end
+    C --> O[Tableau]
 ```
 
----
+## Main API routes
 
-## 📦 Replenishment Logic
+- `GET /`
+- `GET /health`
+- `GET /model-info`
+- `GET /monitoring-info`
+- `GET /stores`
+- `GET /families`
+- `GET /forecasts`
+- `POST /replenishment`
 
-The replenishment module is deterministic decision support rather than a learned inventory-optimization model.
+`/monitoring-info` describes what I would monitor, but the current deployment does not have persistent production telemetry. I keep that distinction explicit in the API response.
 
-```text
-Inventory Position =
-Current Inventory + Inbound Inventory
-```
+## Promotion analysis
 
-```text
-Safety Stock =
-Average Daily Forecast × Safety-Stock Days
-```
+The historical promotion flag is observational. I do not treat promoted versus non-promoted sales as a causal A/B-test result.
 
-```text
-Reorder Point =
-Lead-Time Demand + Safety Stock
-```
+`experiments/promotion_lift_analysis.py` only reports descriptive differences. A separate document explains how I would design a randomized store-level promotion test and what information would be needed for a proper power analysis.
 
-```text
-Target Inventory Level =
-Protection-Period Demand + Safety Stock
-```
+See [docs/experiment_design_promotion_test.md](docs/experiment_design_promotion_test.md).
 
-```text
-Raw Order Quantity =
-Target Inventory Level − Inventory Position
-```
+## Run locally
 
-Confirmed inbound inventory reduces the remaining order requirement, but it is not counted as on-hand stock before its scheduled arrival. The final suggested quantity also applies non-negative order constraints, minimum order quantity, case-pack rounding, and forecast coverage validation.
-
----
-
-## ⚡ API Endpoints
-
-| Method | Endpoint | Description |
-|---|---|---|
-|GET|`/`|Return API service information|
-|GET|`/health`|Verify API and forecast-data availability|
-|GET|`/model-info`|Return model and validation information|
-|GET|`/monitoring-info`|Return monitoring status and recommended signals|
-|GET|`/stores`|List available stores|
-|GET|`/families`|List available product families|
-|GET|`/forecasts`|Return a store-family forecast|
-|POST|`/replenishment`|Calculate a replenishment recommendation|
-
-### Forecast Request Example
-
-```text
-GET /forecasts?store_nbr=1&family=AUTOMOTIVE
-```
-
-### Replenishment Request Example
-
-```json
-{
-  "store_nbr": 1,
-  "family": "AUTOMOTIVE",
-  "current_inventory": 20,
-  "inbound_inventory": 0,
-  "lead_time_days": 3,
-  "safety_stock_days": 2,
-  "review_period_days": 7,
-  "case_pack_size": 6,
-  "minimum_order_quantity": 12
-}
-```
-
-Interactive API documentation:
-
-```text
-https://retail-demand-forecasting-api-momo.onrender.com/docs
-```
-
----
-
-## 🗂️ Project Structure
-
-```text
-retail-demand-forecasting/
-│
-├── .devcontainer/
-│   └── devcontainer.json
-├── .github/
-│   └── workflows/
-│       └── tests.yml
-├── .streamlit/
-│   └── config.toml
-├── api/
-│   ├── __init__.py
-│   └── main.py
-├── dashboard/
-│   ├── app.py
-│   ├── requirements.txt
-│   └── data/
-├── data/
-│   ├── processed/
-│   └── raw/
-├── docs/
-│   ├── images/
-│   │   ├── dashboard-network-pulse.png
-│   │   ├── dashboard-stock-decision.png
-│   │   └── dashboard-store-story.png
-│   ├── backtesting_strategy.md
-│   ├── data_source.md
-│   ├── error_analysis.md
-│   ├── experiment_design_promotion_test.md
-│   ├── feature_availability.md
-│   ├── model_card.md
-│   ├── monitoring_plan.md
-│   └── replenishment_assumptions.md
-├── experiments/
-│   └── promotion_lift_analysis.py
-├── reports/
-│   ├── data/
-│   ├── figures/
-│   └── modeling/
-├── scripts/
-├── src/
-│   └── retail_forecasting/
-├── tests/
-├── Dockerfile
-├── .python-version
-├── pyproject.toml
-├── requirements.txt
-├── requirements-api.txt
-├── requirements-dev.txt
-└── README.md
-```
-
----
-
-## 🛠️ Local Installation
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/momo840505/retail-demand-forecasting.git
-cd retail-demand-forecasting
-```
-
-### 2. Create a Virtual Environment
-
-#### Windows PowerShell
+### 1. Create an environment
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-```
-
-#### macOS or Linux
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-```
-
-### 3. Install Dependencies
-
-```bash
 python -m pip install --upgrade pip
 python -m pip install -r requirements-dev.txt
 python -m pip install -e .
 ```
 
----
+### 2. Run the dashboard
 
-## ▶️ Run the Dashboard
-
-```bash
+```powershell
 python -m streamlit run dashboard/app.py
 ```
 
-Local URL:
+### 3. Run the API
 
-```text
-http://localhost:8501
-```
-
----
-
-## ▶️ Run the API
-
-```bash
+```powershell
 python -m uvicorn api.main:app --reload
 ```
 
-API documentation:
+API docs:
 
 ```text
 http://127.0.0.1:8000/docs
 ```
 
-Health check:
+## Rebuild the pipeline
 
-```text
-http://127.0.0.1:8000/health
-```
-
----
-
-## 🧪 Testing
-
-Run the complete test suite:
-
-```bash
-python -m pytest -q
-```
-
-Run syntax validation:
-
-```bash
-python -m compileall -q api dashboard src experiments scripts
-```
-
-Verify the FastAPI application:
-
-```bash
-python -c "from api.main import app; print(app.title)"
-```
-
-GitHub Actions automatically runs the test workflow for pushes and pull requests targeting `main`.
-
----
-
-## 🔄 Rebuild the Forecasting Pipeline
-
-```bash
+```powershell
 python scripts/verify_raw_data.py
 python scripts/profile_data.py
 python scripts/build_modeling_dataset.py
@@ -577,77 +219,73 @@ python scripts/train_final_model.py
 python scripts/prepare_dashboard_data.py
 ```
 
----
+## Tests
 
-## 📚 Data Source
+```powershell
+python -m pytest -q
+python -m compileall -q api dashboard src experiments scripts
+python -c "from api.main import app; print(app.title)"
+```
 
-This project uses data from the Kaggle competition:
+GitHub Actions runs the tests, source compilation, and FastAPI import check on pushes and pull requests to `main`.
 
-[Store Sales - Time Series Forecasting](https://www.kaggle.com/competitions/store-sales-time-series-forecasting)
+## Project layout
 
-The original competition files are not included in this repository.
+```text
+retail-demand-forecasting/
+├── api/
+├── dashboard/
+├── data/
+├── docs/
+├── experiments/
+├── reports/
+├── scripts/
+├── src/retail_forecasting/
+├── tests/
+├── Dockerfile
+├── requirements.txt
+├── requirements-api.txt
+├── requirements-dev.txt
+└── README.md
+```
 
----
+## Data source
 
-## ⚠️ Limitations
+The project uses the Kaggle competition [Store Sales - Time Series Forecasting](https://www.kaggle.com/competitions/store-sales-time-series-forecasting).
 
-A few things worth being upfront about:
+The original competition files are not committed to this repository.
 
-* The deployed dashboard displays a fixed historical forecast window.
-* Final competition test labels are unavailable.
-* Inventory levels and supplier lead times are not included in the original dataset.
-* Holding cost and stockout cost are not included.
-* Minimum order constraints are user-defined assumptions.
-* Stockout risk bands are deterministic rather than calibrated probabilities.
-* Replenishment recommendations are decision support only.
-* The Render API may take longer to respond after inactivity on the free hosting plan.
+## Current limitations
 
----
+- The deployed forecast is a fixed historical 16-day window, not a live rolling forecast.
+- The final Kaggle test labels are not public.
+- The source data does not contain real on-hand inventory or supplier lead times.
+- Safety-stock days, lead time, case-pack size, and minimum order quantity are user assumptions.
+- The stockout risk bands are rules, not calibrated probabilities.
+- The model does not produce prediction intervals yet.
+- Monitoring is documented but there is no persistent drift/telemetry service in the current deployment.
+- Retraining and ingestion are manual rather than scheduled.
 
-## 🔭 Future Improvements
+## Tools used
 
-The next improvements I would prioritise are:
+- Python 3.11
+- pandas
+- XGBoost
+- FastAPI
+- Streamlit
+- Tableau
+- Plotly
+- pytest
+- GitHub Actions
+- Docker
+- AWS Elastic Beanstalk
 
-* prediction intervals;
-* probabilistic demand forecasting;
-* calibrated stockout probabilities;
-* supplier lead-time variability;
-* warehouse and transport constraints;
-* persistent inventory storage;
-* scheduled retraining;
-* model monitoring and data-drift detection;
-* regional and product-hierarchy forecasting;
-* individual forecast explainability;
-* automated data ingestion.
+## Notes and supporting docs
 
----
-
-## 💼 Technical Scope
-
-This project covers:
-
-* time-series forecasting;
-* feature engineering;
-* leakage prevention;
-* chronological model validation;
-* XGBoost modeling;
-* retail and supply-chain analytics;
-* inventory decision support;
-* dashboard development;
-* REST API development;
-* automated testing;
-* continuous integration;
-* cloud deployment;
-* responsive web design.
-
----
-
-<div align="center">
-
-### Built with Python, XGBoost, Streamlit, FastAPI, Plotly, pytest, GitHub Actions, Render, and AWS Elastic Beanstalk
-
-[Live Dashboard](https://retail-demand-forecasting-momo.streamlit.app) ·
-[API Documentation](https://retail-demand-forecasting-api-momo.onrender.com/docs) ·
-[GitHub Repository](https://github.com/momo840505/retail-demand-forecasting)
-
-</div>
+- [Backtesting strategy](docs/backtesting_strategy.md)
+- [Feature availability](docs/feature_availability.md)
+- [Model card](docs/model_card.md)
+- [Error analysis](docs/error_analysis.md)
+- [Monitoring plan](docs/monitoring_plan.md)
+- [Replenishment assumptions](docs/replenishment_assumptions.md)
+- [Promotion experiment design](docs/experiment_design_promotion_test.md)
